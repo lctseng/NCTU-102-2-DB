@@ -54,6 +54,7 @@ if($db_data)
       echo "DB Connect OK!";
       $user_email = $_POST['email'];
       $_SESSION['email'] = $user_email;
+
    }
    else
    {
