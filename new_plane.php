@@ -49,10 +49,10 @@ function show_add_new_page()
          </select><br>
          Arrival Date<br>
          <input type="date" name="arrive_date"> - 
-         <select name="depart_hour">
+         <select name="arrive_hour">
             $hour_cmd_str
          </select> :
-         <select name="depart_min">
+         <select name="arrive_min">
             $min_cmd_str
          </select><br>
          <input type="submit" name="btn_trigger" value="Create Plane">
