@@ -1,4 +1,5 @@
 <?php
+session_start();
 
 function show_err_page($err_title,$err_msg = "")
 {
@@ -51,6 +52,8 @@ if($db_data)
    if($db)
    {
       echo "DB Connect OK!";
+      $user_email = $_POST['email'];
+      $_SESSION['email'] = $user_email;
    }
    else
    {
@@ -63,10 +66,10 @@ else
    show_err_page("Database Info Error!","Cannot load database connection info.");
 }
    
-echo "${_POST['email']}<br>";
-echo "${_POST['password']}<br>";
-echo "${_POST['password_confirm']}<br>";
-echo "${_POST['is_admin']}<br>";
+#echo "${_POST['email']}<br>";
+#echo "${_POST['password']}<br>";
+#echo "${_POST['password_confirm']}<br>";
+#echo "${_POST['is_admin']}<br>";
    
 
 

@@ -1,3 +1,11 @@
+<?php
+   session_start();  
+?>
+
+<?php
+function show_sign_in_page()
+{
+   echo <<<DOC_HTML
 <!doctype html>
 <html lang="en">
    <head>
@@ -18,5 +26,44 @@
          <a href="forget_pwd.php">Forgot your password?</a><br>
          
       </body>
+</html>
+DOC_HTML;
+}
+
+function show_signed_in_page(){
+   echo <<<DOC_HTML
+<!doctype html>
+<html lang="en">
+   <head>
+      <meta charset="utf-8">
+      <title>Signed In</title>
+   </head>
+   <body>
+      <h1>You have Signed in as ${_SESSION["email"]}</h1>
+      <button type="button" onclick="javascript:location.href='sign_out.php'">Sign out</button>
+   </body>
 
 </html>
+
+
+
+
+
+DOC_HTML;
+}
+
+#echo "Session Var:<br>";
+#var_dump($_SESSION);
+#echo "<br>";
+
+if ($_SESSION["email"])
+{
+   show_signed_in_page();
+   #echo "You have sign in as ${_SESSION['email']}";  
+}
+else
+{
+   show_sign_in_page();
+}
+
+?>
