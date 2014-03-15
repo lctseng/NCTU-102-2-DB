@@ -59,6 +59,10 @@ function account_check($account)
    {
       return false;   
    }
+   if(substr_count($account,"\t")>0)
+   {
+      return false;
+   }
 
    return true;
 }
