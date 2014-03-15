@@ -31,6 +31,11 @@ DOC_HTML;
 }
 
 function show_signed_in_page(){
+   $p_class = "Normal User";
+   if($_SESSION["is_admin"]>0)
+   {
+    $p_class = "Administrator";      
+   }
    echo <<<DOC_HTML
 <!doctype html>
 <html lang="en">
@@ -39,8 +44,10 @@ function show_signed_in_page(){
       <title>Signed In</title>
    </head>
    <body>
-      <h1>You have Signed in as ${_SESSION["email"]}</h1>
-      <button type="button" onclick="javascript:location.href='sign_out.php'">Sign out</button>
+      
+      <button type="button" onclick="javascript:location.href='sign_out.php'">Sign out</button> 
+      <h1>You have signed in as ${_SESSION["email"]}</h1>
+      <h2>Your privilege is $p_class</h2> 
    </body>
 
 </html>

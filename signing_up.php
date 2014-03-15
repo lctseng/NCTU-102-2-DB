@@ -126,6 +126,7 @@ if($db_data)
          {
             #echo "Sign up Success!<br>";
             $_SESSION['email'] = $user_email;
+            $_SESSION['is_admin'] = $is_admin;
             show_success_page();
          }
          else

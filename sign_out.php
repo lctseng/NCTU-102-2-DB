@@ -9,7 +9,8 @@ session_destroy();
       <title>Redirecting...</title>
    </head>
    <body>
-      <h2>You have signed out.Redirect in 3 seconds....</h2>
+      <h2>You have signed out</h2>
+      <h2>Redirect in 3 seconds....</h2>
       Or click <a href="index.php">here</a> to redirect.<br>
    </body>
 
