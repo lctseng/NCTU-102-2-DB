@@ -82,16 +82,20 @@ EXTRA_HTML;
 DOC_HTML;
    $d_hour_cmd_str = "";
    $a_hour_cmd_str = "";
+   #var_dump($_POST['btn_modify']);
    $m_plane_data=array_shift(load_plane_data((int)($_POST['btn_modify'])));
    $plane_data_ok = false;
    if($m_plane_data){
       $plane_data_ok = true;
    }
+   #var_dump(load_plane_data((int)($_POST['btn_modify'])));
+   #var_dump($m_plane_data);
    for($i=0;$i<24;$i++){
       $d_selected = "";
       $a_selected = "";
       if($plane_data_ok && $m_plane_data["depart_h"]==$i){
          $d_selected = "selected";
+         #echo "Selected Hour:$i";
       }
       if($plane_data_ok && $m_plane_data['arrive_h']==$i){
          $a_selected = "selected";
@@ -177,13 +181,18 @@ echo <<<DOC_HTML
       th
       {
          font-family:verdana;color:rgb(0,0,255);
-         width:130px;
+         width:150px;
+         height:50px;
       }
       td
       {
-         
+         height:50px;   
          font-family:verdana;;
 
+      }
+      input
+      {
+         width:130px;
       }
    </style>
 </head>
@@ -201,7 +210,7 @@ echo <<<DOC_HTML
          <th>To</th>
          <th style='width:250px;'>Depart</th>
          <th style='width:250px'>Arrive</th> 
-         $p_extra_th;
+         $p_extra_th
       </tr>
       $plane_str_list 
    </table>
@@ -296,7 +305,7 @@ function insert_new_plane($post)
         . " VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
       $sth = $db->prepare($sql);
       #echo "SQL:$sql";
-      $result = $sth->execute(array($post['flight_num'],$post['depart'],$post['dest'],$post['depart_date'],$post['depart_hour'],$post['depart_min'],$post['arrive_date'],$post['arrive_hour'],$post['arrive_min']));
+      $result = $sth->execute(array(escape_html_tag(($post['flight_num'])),escape_html_tag($post['depart']),escape_html_tag($post['dest']),$post['depart_date'],$post['depart_hour'],$post['depart_min'],$post['arrive_date'],$post['arrive_hour'],$post['arrive_min']));
       #echo "Result:$result";
       return $result;
    }
@@ -325,7 +334,7 @@ function update_plane($post)
         . " WHERE `Flight`.`id`=? ";
       $sth = $db->prepare($sql);
       #echo "SQL:$sql";
-      $result = $sth->execute(array($post['flight_num'],$post['depart'],$post['dest'],$post['depart_date'],$post['depart_hour'],$post['depart_min'],$post['arrive_date'],$post['arrive_hour'],$post['arrive_min'],$post['btn_save']));
+      $result = $sth->execute(array(escape_html_tag($post['flight_num']),escape_html_tag($post['depart']),escape_html_tag($post['dest']),$post['depart_date'],$post['depart_hour'],$post['depart_min'],$post['arrive_date'],$post['arrive_hour'],$post['arrive_min'],$post['btn_save']));
       #echo "Result:$result";
       return $result;
    }
@@ -355,18 +364,24 @@ function delete_plane($post)
 }
 
 
-
+function escape_html_tag($str)
+{
+   return strip_tags($str);
+   #$result = strtr($str,"<",'&lt');
+   #var_dump($result);
+   #return $result;
+   #return strtr(strtr($str,"<","&lt;"),">","&gt;");
+}
 
 function load_plane_data($id)
 {
    $db = create_db_link();
    if($db)
    {
-      #echo "$id";
       if($id && $id > 0){
-         $sql = "SELECT * FROM `Flight` ORDER BY  `id` ASC WHERE `id` = ?";
+         $sql = "SELECT * FROM `Flight` WHERE `id` = ?";
          $sth = $db->prepare($sql);
-         $sth->execute(array($id));
+         $sth->execute(array("$id"));
       }
       else{
          $sql = "SELECT * FROM `Flight` ORDER BY  `id` ASC";
@@ -379,9 +394,9 @@ function load_plane_data($id)
       {
          $info = array();
          $info['id'] = $result->id;
-         $info['num'] = $result->flight_number;
-         $info['depart'] = $result->departure;
-         $info['dest'] = $result->destination;
+         $info['num'] = escape_html_tag($result->flight_number);
+         $info['depart'] = escape_html_tag($result->departure);
+         $info['dest'] = escape_html_tag($result->destination);
          $info['depart_d'] = strtok($result->departure_date," ");
          $info['depart_h'] = $result->depart_hour;
          $info['depart_m'] = $result->depart_min;
