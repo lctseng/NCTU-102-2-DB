@@ -1,11 +1,12 @@
 <?php
+session_save_path("./sessions");
 session_start();
 session_destroy();
 ?>
 <!doctype html>
 <html lang="en">
    <head>
-      <meta charset="utf-8" http-equiv="refresh" content="3; url=index.php">
+      <meta charset="utf-8" http-equiv="refresh" content="0; url=index.php">
       <title>Redirecting...</title>
    </head>
    <body>

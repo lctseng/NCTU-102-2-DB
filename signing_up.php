@@ -1,4 +1,5 @@
 <?php
+session_save_path("./sessions");
 session_start();
 
 function show_err_page($err_title,$err_msg = "")

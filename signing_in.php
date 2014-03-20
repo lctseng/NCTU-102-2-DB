@@ -1,4 +1,5 @@
 <?php
+session_save_path("./sessions");
 session_start();
 
 function show_err_page($err_title,$err_msg = "")
@@ -30,7 +31,7 @@ function show_success_page()
 <!doctype html>
 <html lang="en">
    <head>
-      <meta charset="utf-8" http-equiv="refresh" content="3; url=index.php">
+      <meta charset="utf-8" http-equiv="refresh" content="0; url=index.php">
       <title>Success Signed In</title>
    </head>
    <body>

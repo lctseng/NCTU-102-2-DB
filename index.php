@@ -1,4 +1,5 @@
 <?php
+   session_save_path("./sessions");
    session_start();  
 ?>
 
@@ -11,20 +12,70 @@ function show_sign_in_page()
    <head>
       <meta charset="utf-8">
       <title>Flight Schedule</title>
-      </head>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <link href="bootstrap/css/bootstrap.css" rel="stylesheet">
+      <style type="text/css">
+         body{
+            padding-top: 40px;
+            padding-bottom: 40px;
+            padding-left: 50px;
+            background-color: #f5f5f5;
+         }
+         .form-signin{
+            width: 300px;
+            padding: 19px 29px 29px;
+            margin: 0  20px;
+            background-color: #fff;
+            border: 1px solid #e5e5e5;
+            -webkit-border-radius: 10px; 
+               -moz-border-radius: 10px;
+                    border-radous: 10px;
+            -webkit-box-shadow: 0 10px 20px rgba(0,0,0,.05);
+               -moz-box-shadow: 0 10px 20px rgba(0,0,0,.05);
+                    box-shadow: 0 10px 20px rgba(0,0,0,.05);
+         }
+         .signin-head{
+            padding-left: 20px;
+         }
+         .form-signin .signin-head .checkbox{
+            margin-bottom: 10px;
+         }
+         .form-signin input[type="email"]
+         .form-signin input[type="password"]{
+            font-size: 16px;
+            height: auto;
+            margin-bottom: 15px;
+            padding: 9px;
+         }
+         .signin-links{
+            font-size: 16px;
+            padding: 15px 0px 10px 30px;
+         }
+
+      </style>
+      <link href="bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+
+         
+            
+            
+            
+   </head>
       <body>
-         <h1>Sign in</h1>
-         <form action="signing_in.php" method="POST">
+         <h1 class="signin-head">Sign in</h1>
+         <form action="signing_in.php" method="POST" class="form-signin"> 
             Email<br>
             <input type="text" name="email"><br>
             Password<br>
             <input type="password" name="password"><br>
-            <input type="checkbox" name="remember"> Remember me<br>
-            <button type="submit">Sign in</button>
+            <input type="checkbox" name="remember" class="checkbox"> Remember me<br>
+            <button type="submit" class="btn btn-large btn-primary">Sign in</button>
          </form>
-         <a href="sign_up.php">Sign up</a><br>
-         <a href="forget_pwd.php">Forgot your password?</a><br>
-         
+         <label class="signin-links">
+            <a href="sign_up.php">Sign up</a><br>
+            <a href="forget_pwd.php">Forgot your password?</a><br>
+         </label>
+         <script src="/bootstrap/js/bootstrapSourceJS?v=XkouIldXq_pPzIiEbylJIGwgBv2qYDSef1Dnn06aIkQ1">
+         </script>
       </body>
 </html>
 DOC_HTML;
