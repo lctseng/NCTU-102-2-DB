@@ -46,7 +46,7 @@ function show_add_new_page()
               padding: 7px 9px;
          }
          .form-signin select{
-            width:50px;
+            width:80px;
          }
          
       </style>

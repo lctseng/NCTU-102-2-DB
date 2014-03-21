@@ -309,7 +309,7 @@ echo <<<DOC_HTML
       }
       .date-select{
          height:30px;
-         width: 50px;
+         width: 80px;
       }
       #btn-main{
          height: 30px;
@@ -326,10 +326,10 @@ echo <<<DOC_HTML
       <tr>
          <th style='width:50px;'>ID</th>
          <th>Flight Number</th>
-         <th>From</th>
-         <th>To</th>
-         <th style='width:250px;'>Depart</th>
-         <th style='width:250px'>Arrive</th> 
+         <th>Departure</th>
+         <th>Destination</th>
+         <th style='width:250px;'>Depart Date</th>
+         <th style='width:250px'>Arrive Date</th> 
          $p_extra_th
       </tr>
       $plane_str_list 
