@@ -34,8 +34,12 @@ function show_sign_in_page()
                -moz-box-shadow: 0 10px 20px rgba(0,0,0,.05);
                     box-shadow: 0 10px 20px rgba(0,0,0,.05);
          }
-         .signin-head{
+         .welcome{
+            color: rgba(0,0,155,200);
             padding-left: 20px;
+         }
+         .signin-head{
+            padding-left: 0px;
          }
          .form-signin .signin-head .checkbox{
             margin-bottom: 10px;
@@ -61,8 +65,9 @@ function show_sign_in_page()
             
    </head>
       <body>
-         <h1 class="signin-head">Sign in</h1>
+         <h1 class="welcome">Flight Schedule System</h1>
          <form action="signing_in.php" method="POST" class="form-signin"> 
+            <h1 class="signin-head">Sign in</h1>
             Email<br>
             <input type="text" name="email"><br>
             Password<br>
