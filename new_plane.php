@@ -30,16 +30,36 @@ function show_add_new_page()
    <head>
       <meta charset="utf-8">
       <title>Add New Plane</title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <link href="bootstrap/css/bootstrap.css" rel="stylesheet">
+      <style>
+         body {
+            margin-left:50px;
+            padding-top: 40px;
+            padding-bottom: 40px;
+            background-color: #f5f5f5;
+         }
+         .form-signin input[type="text"]{
+              font-size: 16px;
+              height: auto;
+              margin-bottom: 15px;
+              padding: 7px 9px;
+         }
+         .form-signin select{
+            width:50px;
+         }
+         
+      </style>
    </head>
    <body>
       <h1>New Plane</h1>
-      <form action="index.php" method="POST">
+      <form action="index.php" class="form-signin"  method="POST">
          Flight Number<br>
-         <input type="text" name="flight_num"><br>
+         <input type="text"   name="flight_num"><br>
          Departure<br>
-         <input type="text" name="depart"><br>
+         <input type="text"   name="depart"><br>
          Destination<br>
-         <input type="text" name="dest"><br>
+         <input type="text"   name="dest"><br>
          Departure Date<br>
          <input type="date" name="depart_date"> - 
          <select name="depart_hour">
@@ -56,8 +76,8 @@ function show_add_new_page()
          <select name="arrive_min">
             $min_cmd_str
          </select><br>
-         <input type="submit" name="btn_trigger" value="Create Plane">
-         <button type="button" onclick="javascript:location.href='index.php'">Cancel</button>
+         <input type="submit" class="btn btn-primary"  name="btn_trigger" value="Create Plane">
+         <button type="button" class="btn btn-primary"  onclick="javascript:location.href='index.php'">Cancel</button>
       </form>
    </body>
 

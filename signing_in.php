@@ -9,7 +9,20 @@ function show_err_page($err_title,$err_msg = "")
 <html lang="en">
    <head>
       <meta charset="utf-8" http-equiv="refresh" content="3; url=index.php">
-      <title>Sign Up Error</title>
+      <title>Sign In Error</title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <link href="bootstrap/css/bootstrap.css" rel="stylesheet">
+      <style type="text/css">
+      body {
+        padding-left: 50px;
+        padding-top: 40px;
+        padding-bottom: 40px;
+        background-color: #f5f5f5;
+        background-attachment: fixed; 
+        background-image: url("img/character.png"); 
+        background-repeat: no-repeat; 
+      }
+      </style> 
    </head>
    <body>
       <h1>$err_title</h1>
@@ -31,12 +44,25 @@ function show_success_page()
 <!doctype html>
 <html lang="en">
    <head>
-      <meta charset="utf-8" http-equiv="refresh" content="0; url=index.php">
+      <meta charset="utf-8" http-equiv="refresh" content="1; url=index.php">
       <title>Success Signed In</title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <link href="bootstrap/css/bootstrap.css" rel="stylesheet">
+      <style type="text/css">
+      body {
+        padding-left: 50px;
+        padding-top: 40px;
+        padding-bottom: 40px;
+        background-color: #f5f5f5;
+        background-attachment: fixed; 
+        background-image: url("img/character.png"); 
+        background-repeat: no-repeat; 
+      }
+      </style>
    </head>
    <body>
       <h1>Signed In Success</h1>
-      You are success signed in.Please wait for redirect in 3 seconds...<br>
+      You are success signed in.Please wait for redirect in 1 seconds...<br>
       Or you can click <a href="index.php">here</a> to go to main page.<br>
    <body>
 </html>

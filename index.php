@@ -15,16 +15,17 @@ function show_sign_in_page()
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <link href="bootstrap/css/bootstrap.css" rel="stylesheet">
       <style type="text/css">
+         html,body{
+            min_height :100% !important;
+            height: 100%;
+         }
          body{
-            padding-top: 40px;
-            padding-bottom: 40px;
-            padding-left: 50px;
             background-color: #f5f5f5;
          }
          .form-signin{
             width: 300px;
-            padding: 19px 29px 29px;
-            margin: 0  20px;
+            padding: 19px 29px 29px ;
+            margin: 0  20px 0 100px;
             background-color: #fff;
             border: 1px solid #e5e5e5;
             -webkit-border-radius: 10px; 
@@ -36,7 +37,7 @@ function show_sign_in_page()
          }
          .welcome{
             color: rgba(0,0,155,200);
-            padding-left: 20px;
+            padding-left: 80px;
          }
          .signin-head{
             padding-left: 0px;
@@ -52,9 +53,28 @@ function show_sign_in_page()
             padding: 9px;
          }
          .signin-links{
+            margin-left:80px;
             font-size: 16px;
             padding: 15px 0px 10px 30px;
          }
+         #wrap{
+            min_height: 100%;
+            height: auto !important;
+            height:100%;
+            margin: 0 auto -60px;
+         }
+         #push
+         {
+            height:360px;
+         }
+         #footer{
+            margin-left: -100px;
+            font-size : 16px;
+            padding: 20px 0px 20px 50px;
+            background-color: rgba(255,255,255,255);
+         }
+
+   
 
       </style>
       <link href="bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
@@ -65,20 +85,31 @@ function show_sign_in_page()
             
    </head>
       <body>
-         <h1 class="welcome">Flight Schedule System</h1>
-         <form action="signing_in.php" method="POST" class="form-signin"> 
-            <h1 class="signin-head">Sign in</h1>
-            Email<br>
-            <input type="text" name="email"><br>
-            Password<br>
-            <input type="password" name="password"><br>
-            <input type="checkbox" name="remember" class="checkbox"> Remember me<br>
-            <button type="submit" class="btn btn-large btn-primary">Sign in</button>
-         </form>
-         <label class="signin-links">
-            <a href="sign_up.php">Sign up</a><br>
-            <a href="forget_pwd.php">Forgot your password?</a><br>
-         </label>
+         <div id="wrap">
+            <h1 class="welcome">Flight Schedule System</h1>
+            <form action="signing_in.php" method="POST" class="form-signin"> 
+               <h1 class="signin-head">Sign in</h1>
+               Email<br>
+               <input type="text" name="email"><br>
+               Password<br>
+               <input type="password" name="password"><br>
+               <input type="checkbox" name="remember" class="checkbox"> Remember me<br>
+               <button type="submit" class="btn btn-large btn-primary">Sign in</button>
+            </form>
+            <label class="signin-links">
+               <a href="sign_up.php">Sign up</a><br>
+               <a href="forget_pwd.php">Forgot your password?</a><br>
+            </label>
+
+            <div id="push"></div>
+         </div>
+
+         <div id="footer">
+            <div class="container">
+               <p class="footer_msg">Create by Liang-Chi Tseng, Belongs to <a href="http://jinjya-304.nctucs.net/">NCTU JinJya-304</a></p>
+            </div>
+         </div>
+      
          <script src="/bootstrap/js/bootstrapSourceJS?v=XkouIldXq_pPzIiEbylJIGwgBv2qYDSef1Dnn06aIkQ1">
          </script>
       </body>
@@ -99,7 +130,7 @@ function show_signed_in_page(){
       $admin = true;
       $p_class = "Administrator";
       $extra_button=<<<EXTRA_HTML
-<button type="button" onclick="javascript:location.href='new_plane.php'">New Plane</button>
+<button type="button" id="btn-new" class="btn btn-success" onclick="javascript:location.href='new_plane.php'">New Plane</button>
 EXTRA_HTML;
       $p_extra_th=<<<EXTRA_HTML
 <th></th>
@@ -108,14 +139,14 @@ EXTRA_HTML;
       $p_extra_td_show=<<<EXTRA_HTML
 <td>
    <form action="index.php" method="POST">
-      <button type="submit" style= "width:100px;" name="btn_modify" value="%d">
+      <button type="submit" class="btn btn-primary" style= "width:100px;" name="btn_modify" value="%d">
          Modify
       </button>
    </form>
 </td>
 <td>
    <form action="index.php" method="POST">
-      <button type="submit" style= "width:100px;" name="btn_delete" value="%d">
+      <button type="submit" class="btn btn-danger"  style= "width:100px;" name="btn_delete" value="%d">
          Delete
       </button>
    </form>
@@ -187,26 +218,30 @@ DOC_HTML;
          <input type="text" name="dest" value=%s>
       </td>
       <td>
-         <input type="date" name="depart_date" value=%s ><select name="depart_hour" value=%s>
+         <input type="date" name="depart_date" value=%s ><br>
+         <select class="date-select" name="depart_hour" value=%s>
                $d_hour_cmd_str
-            </select><select name="depart_min" value=%s>
+         </select>
+         <select class="date-select" name="depart_min" value=%s>
                $d_min_cmd_str
-            </select>
+         </select>
       </td>
       <td>
-         <input type="date" name="arrive_date" value=%s><select name="arrive_hour" value=%s>
+         <input type="date" name="arrive_date" value=%s><br>
+         <select class="date-select" name="arrive_hour" value=%s>
                $a_hour_cmd_str
-            </select><select name="arrive_min" value=%s>
+         </select>
+         <select class="date-select" name="arrive_min" value=%s>
                $a_min_cmd_str
-            </select>
+         </select>
       </td>
       <td>
-         <button type="submit" style= "width:100px;" name="btn_save" value="%d">
+         <button type="submit" id="btn-main" class="btn btn-primary"  style= "width:100px;" name="btn_save" value="%d">
             Save
          </button>
       </td>
       <td>
-         <button type="submit" style= "width:100px;" name="btn_cancel">
+         <button type="submit" id="btn-main" class="btn btn-danger" style= "width:100px;" name="btn_cancel">
             Cancel
          </button>
    </form>
@@ -228,21 +263,29 @@ echo <<<DOC_HTML
 <head>
    <meta charset="utf-8">
    <title>Signed In</title>
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <link href="bootstrap/css/bootstrap.css" rel="stylesheet">
    <style type="text/css">
+      body{
+         margin-left:50px;
+      }
       table
       {
+         padding-left:30px;
          border:1px solid black;
          text-align: left;
       }
       th
       {
+         padding-left:10px;
          font-family:verdana;color:rgb(0,0,255);
          width:150px;
-         height:50px;
+         height:80px;
       }
       td
       {
-         height:50px;   
+         padding-left:10px;
+         height:80px;   
          font-family:verdana;;
 
       }
@@ -250,13 +293,34 @@ echo <<<DOC_HTML
       {
          width:130px;
       }
+      .main-user,.main-priv{
+         padding: 10px 0px 10px 0px;
+         font-size: 24px;
+      }
+      .main-priv{
+         color: rgb(255,0,0);
+      }
+
+      #btn-out{
+        margin: 20px 20px 20px 0px; 
+      }
+      #btn-new{
+         margin: 20px 20px 20px 0px;
+      }
+      .date-select{
+         height:30px;
+         width: 50px;
+      }
+      #btn-main{
+         height: 30px;
+         width: 500px;
+      }
    </style>
 </head>
 <body>
-   
-   <button type="button" onclick="javascript:location.href='sign_out.php'">Sign out</button><br> 
-   <p style='font-family:verdana;'>You have signed in as <b> ${_SESSION["email"]}</b></p>
-   <p style='font-family:verdana;color:rgb(255,0,0);'>Privilege:<b>$p_class</b></p>
+   <button type="button" id="btn-out" class="btn btn-info" onclick="javascript:location.href='sign_out.php'">Sign out</button><br> 
+   <p class="main-user">You have signed in as <b> ${_SESSION["email"]}</b></p>
+   <p class="main-priv">Privilege:<b>$p_class</b></p>
    <p style='font-family:verdana;font-size:32px;font-weight: bold;'>Listing planes</p>
    <table>
       <tr>
@@ -290,6 +354,19 @@ function show_err_page($err_title,$err_msg="",$re_url="index.php",$page_name="pr
 <head>
    <meta charset="utf-8" http-equiv="refresh" content="3; url=$re_url">
    <title>Error!</title>
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <link href="bootstrap/css/bootstrap.css" rel="stylesheet">
+   <style type="text/css">
+      body {
+        padding-left: 50px;
+        padding-top: 40px;
+        padding-bottom: 40px;
+        background-color: #f5f5f5;
+        background-attachment: fixed; 
+        background-image: url("img/character.png"); 
+        background-repeat: no-repeat; 
+      }
+   </style> 
 </head>
 <body>
    <h1>$err_title</h1>
@@ -307,10 +384,10 @@ function check_str_valid($str)
    if(strlen($str)<=0){
       return false;
    }
-   if(substr_count($str," ")>0){
+   if(strlen(str_replace(" ","",$str))<=0){
       return false;
    }
-   if(substr_count($str,"\t")>0){
+   if(strlen(str_replace("\t","",$str))<=0){ 
       return false;
    }
    return true;
@@ -484,7 +561,7 @@ if ($_SESSION["email"])
       } 
       else
       {
-         show_err_page("Data Format Error!","All field must not be empty,and cannot contain spaces.","index.php","main page");
+         show_err_page("Data Format Error!","All field must not be empty,and cannot contain only spaces.","index.php","main page");
       }
       #UPDATE  `Flight` SET  `destination` =  '8' WHERE  `Flight`.`id` =1;
    }
@@ -517,7 +594,7 @@ if ($_SESSION["email"])
       }
       else
       {
-         show_err_page("Data Format Error!","All field must not be empty,and cannot contain spaces.","new_plane.php","plane adding page");
+         show_err_page("Data Format Error!","All field must not be empty,and cannot contain only spaces.","new_plane.php","plane adding page");
       }
       # Process SQL
    } 
