@@ -390,6 +390,9 @@ function check_str_valid($str)
    if(strlen(str_replace("\t","",$str))<=0){ 
       return false;
    }
+   if(strlen(escape_html_tag($str))<=0){
+      return false;   
+   }
    return true;
 }
 
@@ -561,7 +564,7 @@ if ($_SESSION["email"])
       } 
       else
       {
-         show_err_page("Data Format Error!","All field must not be empty,and cannot contain only spaces.","index.php","main page");
+         show_err_page("Data Format Error!","All field must not be empty,and cannot contain only spaces.Or maybe there exist illegal characters.","index.php","main page");
       }
       #UPDATE  `Flight` SET  `destination` =  '8' WHERE  `Flight`.`id` =1;
    }
@@ -594,7 +597,7 @@ if ($_SESSION["email"])
       }
       else
       {
-         show_err_page("Data Format Error!","All field must not be empty,and cannot contain only spaces.","new_plane.php","plane adding page");
+         show_err_page("Data Format Error!","All field must not be empty,and cannot contain only spaces.Or maybe there exist illegal characters.","new_plane.php","plane adding page");
       }
       # Process SQL
    } 
