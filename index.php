@@ -133,20 +133,20 @@ function show_signed_in_page(){
 <button type="button" id="btn-new" class="btn btn-success" onclick="javascript:location.href='new_plane.php'">New Plane</button>
 EXTRA_HTML;
       $p_extra_th=<<<EXTRA_HTML
-<th></th>
-<th></th>
+<td></td>
+<td></td>
 EXTRA_HTML;
       $p_extra_td_show=<<<EXTRA_HTML
 <td>
    <form action="index.php" method="POST">
-      <button type="submit" class="btn btn-primary" style= "width:100px;" name="btn_modify" value="%d">
+      <button type="submit" class="btn btn-primary btn-large" style= "width:100px;" name="btn_modify" value="%d">
          Modify
       </button>
    </form>
 </td>
 <td>
    <form action="index.php" method="POST">
-      <button type="submit" class="btn btn-danger"  style= "width:100px;" name="btn_delete" value="%d">
+      <button type="submit" class="btn btn-danger btn-large"  style= "width:100px;" name="btn_delete" value="%d">
          Delete
       </button>
    </form>
@@ -218,7 +218,7 @@ DOC_HTML;
          <input type="text" name="dest" value=%s>
       </td>
       <td>
-         <input type="date" name="depart_date" value=%s ><br>
+         <input type="date" style="width:150px;" name="depart_date" value=%s ><br>
          <select class="date-select" name="depart_hour" value=%s>
                $d_hour_cmd_str
          </select>
@@ -227,7 +227,7 @@ DOC_HTML;
          </select>
       </td>
       <td>
-         <input type="date" name="arrive_date" value=%s><br>
+         <input type="date" style="width:150px;"  name="arrive_date" value=%s><br>
          <select class="date-select" name="arrive_hour" value=%s>
                $a_hour_cmd_str
          </select>
@@ -236,12 +236,12 @@ DOC_HTML;
          </select>
       </td>
       <td>
-         <button type="submit" id="btn-main" class="btn btn-primary"  style= "width:100px;" name="btn_save" value="%d">
+         <button type="submit" id="btn-main" class="btn btn-primary btn-large"  style= "width:100px;" name="btn_save" value="%d">
             Save
          </button>
       </td>
       <td>
-         <button type="submit" id="btn-main" class="btn btn-danger" style= "width:100px;" name="btn_cancel">
+         <button type="submit" id="btn-main" class="btn btn-danger btn-large" style= "width:100px;" name="btn_cancel">
             Cancel
          </button>
    </form>
@@ -272,26 +272,17 @@ echo <<<DOC_HTML
       table
       {
          padding-left:30px;
-         border:1px solid black;
          text-align: left;
-      }
-      th
-      {
-         padding-left:10px;
-         font-family:verdana;color:rgb(0,0,255);
-         width:150px;
-         height:80px;
       }
       td
       {
          padding-left:10px;
-         height:80px;   
-         font-family:verdana;;
-
+         font-family:verdana;
+         width:130px;
       }
       input
       {
-         width:130px;
+         width:100px;
       }
       .main-user,.main-priv{
          padding: 10px 0px 10px 0px;
@@ -312,8 +303,12 @@ echo <<<DOC_HTML
          width: 80px;
       }
       #btn-main{
-         height: 30px;
-         width: 500px;
+      }
+      #title-row{
+         font-weight : bold;
+      }
+      #title-cell{
+         ;
       }
    </style>
 </head>
@@ -322,14 +317,14 @@ echo <<<DOC_HTML
    <p class="main-user">You have signed in as <b> ${_SESSION["email"]}</b></p>
    <p class="main-priv">Privilege:<b>$p_class</b></p>
    <p style='font-family:verdana;font-size:32px;font-weight: bold;'>Listing planes</p>
-   <table>
-      <tr>
-         <th style='width:50px;'>ID</th>
-         <th>Flight Number</th>
-         <th>Departure</th>
-         <th>Destination</th>
-         <th style='width:250px;'>Depart Date</th>
-         <th style='width:250px'>Arrive Date</th> 
+   <table class="table table-striped ">
+      <tr class="info" id="title-row">
+         <td id="title-cell" style='width:50px;'>ID</td>
+         <td id="title-cell">Flight Number</td>
+         <td id="title-cell">Departure</td>
+         <td id="title-cell">Destination</td>
+         <td id="title-cell" style='width:250px;'>Depart Date</td>
+         <td id="title-cell" style='width:250px'>Arrive Date</td> 
          $p_extra_th
       </tr>
       $plane_str_list 
