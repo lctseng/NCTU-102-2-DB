@@ -86,7 +86,7 @@ function show_sign_in_page()
    </head>
       <body>
          <div id="wrap">
-            <h1 class="welcome">Flight Schedule System</h1>
+            <h1 class="welcome">Flight Schedule System With Modified</h1>
             <form action="signing_in.php" method="POST" class="form-signin"> 
                <h1 class="signin-head">Sign in</h1>
                Email<br>
