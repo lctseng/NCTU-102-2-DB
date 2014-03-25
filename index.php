@@ -11,7 +11,7 @@ function show_sign_in_page()
 <html lang="en">
    <head>
       <meta charset="utf-8">
-      <title>Flight Schedule</title>
+      <title>Hi! I am Flight Schedule</title>
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <link href="bootstrap/css/bootstrap.css" rel="stylesheet">
       <style type="text/css">
