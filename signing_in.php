@@ -1,6 +1,7 @@
 <?php
 session_save_path("./sessions");
 session_start();
+require_once("./functions/IOProcessing.php");
 
 function show_err_page($err_title,$err_msg = "")
 {
@@ -71,32 +72,10 @@ function show_success_page()
 DOC_HTML;
 }
 
-function load_db_data()
-{
-   return file("db_connect.conf");
-}
-
-function account_check($account)
-{
-   if(strlen($account)==0)
-   {
-      return false;
-   }
-   if(substr_count($account," ")>0)
-   {
-      return false;   
-   }
-
-   return true;
-}
-
-function pwd_hash($user_name,$pwd)
-{
-   return md5(crypt($pwd,md5($user_name.sha1($user_name))));
-}
 
 
-$db_data = @load_db_data();
+
+$db_data = @\lct\func\load_db_data();
 
 if($db_data)
 {
@@ -123,7 +102,7 @@ if($db_data)
       $user_pass = $_POST['password'];
       $user_remember = $_POST['remember'];
       
-      if(!account_check($user_email)){
+      if(!\lct\func\account_check($user_email)){
          show_err_page("Account Format Error","Account cannot contain space, and it cannot be empty.");
       }
       else if(strlen($user_pass)==0)
@@ -147,7 +126,7 @@ if($db_data)
             if($obj = $sth->fetchObject())
             {
                $hash_pass = $obj->password;
-               if(pwd_hash($user_email,$user_pass)===$hash_pass){
+               if(\lct\func\pwd_hash($user_email,$user_pass)===$hash_pass){
                   $_SESSION['email'] = $user_email;
                   $_SESSION['is_admin'] = $obj->is_admin;
                   show_success_page();
@@ -175,11 +154,6 @@ else
 {
    show_err_page("Database Info Error!","Cannot load database connection info.");
 }
-   
-#echo "${_POST['email']}<br>";
-#echo "${_POST['password']}<br>";
-#echo "${_POST['password_confirm']}<br>";
-#echo "${_POST['is_admin']}<br>";
    
 
 

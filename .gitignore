@@ -1,4 +1,5 @@
 db_connect.conf
+functions/db_connect.conf
 OtherPeople
 sessions/*
 *.swp

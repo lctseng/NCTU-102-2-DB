@@ -1,6 +1,7 @@
 <?php
-   session_save_path("./sessions");
-   session_start();  
+session_save_path("./sessions");
+session_start(); 
+require_once('./functions/Database.php');
 ?>
 
 <?php
@@ -86,7 +87,7 @@ function show_sign_in_page()
    </head>
       <body>
          <div id="wrap">
-            <h1 class="welcome">Flight Schedule System With Modified</h1>
+            <h1 class="welcome">Flight Schedule System</h1>
             <form action="signing_in.php" method="POST" class="form-signin"> 
                <h1 class="signin-head">Sign in</h1>
                Email<br>
@@ -402,35 +403,11 @@ function check_array_str_valid($array)
    return true;
 }
 
-function load_db_data()
-{
-   return file("db_connect.conf");
-}
 
-function create_db_link()
-{
-   $db_data = @load_db_data();
-   $db_data = array_map(trim,$db_data);
-   $db_host = array_shift($db_data);
-   $db_name = array_shift($db_data);
-   $db_user = array_shift($db_data);
-   $db_password = array_shift($db_data);
-
-   $dsn = "mysql:host=$db_host;dbname=$db_name";
-   try{
-      $db = new PDO($dsn,$db_user,$db_password);
-   }
-   catch (PDOException $ex)
-   {
-      return false;
-   }
-   return $db;
-
-}
 
 function insert_new_plane($post)
 {
-   $db = create_db_link();
+   $db = \lct\func\create_db_link();
    if($db){
       $sql = "INSERT INTO `Flight` (flight_number,departure,destination,departure_date,depart_hour,depart_min,arrival_date,arrive_hour,arrive_min)"
         . " VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -450,7 +427,7 @@ function insert_new_plane($post)
 function update_plane($post)
 {
    #var_dump($post);
-   $db = create_db_link();
+   $db =  \lct\func\create_db_link();
    if($db){
       $sql = "UPDATE `Flight` SET 
          flight_number = ?,
@@ -479,7 +456,7 @@ function update_plane($post)
 function delete_plane($post)
 {
    #var_dump($post);
-   $db = create_db_link();
+   $db =  \lct\func\create_db_link();
    if($db){
       $sql = "DELETE FROM `Flight`"
         . " WHERE `Flight`.`id`=?";
@@ -506,7 +483,7 @@ function escape_html_tag($str)
 
 function load_plane_data($id)
 {
-   $db = create_db_link();
+   $db =  \lct\func\create_db_link();
    if($db)
    {
       if($id && $id > 0){
