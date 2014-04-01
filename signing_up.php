@@ -129,8 +129,8 @@ if($db_data)
          if($result)
          {
             #echo "Sign up Success!<br>";
-            $_SESSION['email'] = $user_email;
-            $_SESSION['is_admin'] = $is_admin;
+            $uid = \lct\func\get_uid($user_email);
+            \lct\func\on_login($user_email,$uid,$is_admin,false);
             show_success_page();
          }
          else

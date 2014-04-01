@@ -1,8 +1,11 @@
 <?php
 session_save_path("./sessions");
 session_start();
+require_once("./functions/Database.php");
 
-if(!$_SESSION['email']){
+
+if (!\lct\func\check_user_valid($_SESSION["email"]))
+{
    show_err_page("No Logged in.");
 }
 else if($_SESSION['is_admin']<=0){
@@ -60,6 +63,8 @@ function show_add_new_page()
          <input type="text"   name="depart"><br>
          Destination<br>
          <input type="text"   name="dest"><br>
+         Price<br>
+         <input type="number"   name="price"><br>
          Departure Date<br>
          <input type="date" name="depart_date"> - 
          <select name="depart_hour">
@@ -96,6 +101,19 @@ function show_err_page($err_title,$err_msg = "")
    <head>
       <meta charset="utf-8" http-equiv="refresh" content="3; url=index.php">
       <title>Sign Up Error</title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <link href="bootstrap/css/bootstrap.css" rel="stylesheet">
+      <style>
+      body {
+        padding-left: 50px;
+        padding-top: 40px;
+        padding-bottom: 40px;
+        background-color: #f5f5f5;
+        background-attachment: fixed; 
+        background-image: url("img/character.png"); 
+        background-repeat: no-repeat; 
+      }
+      </style>
    </head>
    <body>
       <h1>$err_title</h1>

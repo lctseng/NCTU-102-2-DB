@@ -2,6 +2,7 @@
 session_save_path("./sessions");
 session_start(); 
 require_once('./functions/Database.php');
+require_once('./functions/IOProcessing.php');
 ?>
 
 <?php
@@ -156,18 +157,16 @@ EXTRA_HTML;
    }
    # Plane list
    $plane_str_list = "";
-   $plane_data = load_plane_data(false);
-   $format_show = <<<DOC_HTML
-<tr>
-   <td>%s</td>
-   <td>%s</td>
-   <td>%s</td>
-   <td>%s</td>
-   <td>%s %02d:%02d</td>
-   <td>%s %02d:%02d</td>
-   $p_extra_td_show
-</tr>
-DOC_HTML;
+   if($_SESSION['sheet']){
+      $plane_data = \lct\func\load_sheet_plane_data($_SESSION['email']);
+   }
+   else{
+      $plane_data = load_plane_data(false);
+   }
+
+
+
+
    $d_hour_cmd_str = "";
    $a_hour_cmd_str = "";
    #var_dump($_POST['btn_modify']);
@@ -206,7 +205,7 @@ DOC_HTML;
       $a_min_cmd_str .= "<option $a_selected value=\"$i\">$i</option>";
    }
    $format_modify = <<<DOC_HTML
-<tr>
+<tr id="content-tr">
    <td>%s</td>
    <form action="index.php" method="POST">
       <td>
@@ -217,6 +216,9 @@ DOC_HTML;
       </td>
       <td>
          <input type="text" name="dest" value=%s>
+      </td>
+      <td>
+         <input type="number" name="price" value=%d>
       </td>
       <td>
          <input type="date" style="width:150px;" name="depart_date" value=%s ><br>
@@ -237,6 +239,11 @@ DOC_HTML;
          </select>
       </td>
       <td>
+         <a id="btn-main" class="btn btn-large disabled" style="width:60px;">Invalid
+         </a>
+      </td> 
+      
+      <td>
          <button type="submit" id="btn-main" class="btn btn-primary btn-large"  style= "width:100px;" name="btn_save" value="%d">
             Save
          </button>
@@ -249,16 +256,112 @@ DOC_HTML;
 </tr>
 DOC_HTML;
    #var_dump($_POST);
-   foreach ($plane_data as $info):
+   foreach ($plane_data as $info):      
+      
+      $favorite_btn = "";
+      $favorite_btn_class = "";
+      $favorite_btn_text = "";
+      if(\lct\func\is_favorite($_SESSION['uid'],$info['id']))
+      {
+         $favorite_btn_class .= "btn btn-warning btn-large";
+         $favorite_btn_text .= "Cancel";
+      }
+      else{ 
+         $favorite_btn_class .= "btn btn-success btn-large";
+         $favorite_btn_text .= "Favorite";
+      }
+      $favorite_btn .= <<<EXTRA_HTML
+<form action="index.php" method="POST">
+   <button type="submit" id="btn-main" class="$favorite_btn_class"  style= "width:100px;" name="btn_favorite" value="%d">$favorite_btn_text
+   </button>
+<form>
+EXTRA_HTML;
+      
+      $format_show = <<<DOC_HTML
+<tr id="content-tr">
+   <td>%s</td>
+   <td>%s</td>
+   <td>%s</td>
+   <td>%s</td>
+   <td>%s</td>
+   <td>%s %02d:%02d</td>
+   <td>%s %02d:%02d</td>
+   <td>
+      $favorite_btn
+   </td>
+   $p_extra_td_show
+</tr>
+DOC_HTML;
+
       $format = $format_show;
       if($admin&&$_POST['btn_modify'] && $_POST['btn_modify']==$info['id']){
          $format = $format_modify;
       }
-      $plane_str_list.=sprintf($format,$info['id'],$info['num'],$info['depart'],$info['dest'],$info['depart_d'],$info['depart_h'],$info['depart_m'],$info['arrive_d'],$info['arrive_h'],$info['arrive_m'],$info['id'],$info['id']); 
+      $plane_str_list.=sprintf($format,$info['id'],$info['num'],$info['depart'],$info['dest'],$info['price'],$info['depart_d'],$info['depart_h'],$info['depart_m'],$info['arrive_d'],$info['arrive_h'],$info['arrive_m'],$info['id'],$info['id'],$info['id']); 
    endforeach;   
 
+   $btn_sheet = "";
+   if($_SESSION['sheet']){
+      $page_title="Compare Sheet";
+      $btn_sheet.=<<<DOC_HTML
+<button type="submit" name="btn_sheet" class="btn btn-success" value="off">Flight List
+</button>
+DOC_HTML;
 
-echo <<<DOC_HTML
+   }
+   else{
+      $page_title="Flight List";
+      $btn_sheet .= <<<DOC_HTML
+<button type="submit" name="btn_sheet" class="btn btn-primary" value="on">Compare Sheet
+</button>
+
+
+
+
+DOC_HTML;
+   }
+
+   $script_post = \lct\func\post_script_string(); 
+
+   $asc_valid_str = "";
+   $desc_valid_str = "";
+   if($_SESSION['sort']['type']==1){
+      $desc_valid_str = "selected"; 
+   }
+   else{
+      $asc_valid_str = "selected";
+   }
+
+   $sort_key_option_str = "";
+   $sort_key_names = array("ID","Flight Number","Departure","Destination","Price","Departure Date","Arrival Date");
+   $key_sz = count($sort_key_names);
+   for($i=0;$i<$key_sz;$i++)
+   {
+      $selected_str = "";
+      if($_SESSION['sort']['key']==$i){
+         $selected_str = "selected";
+      }
+      $sort_key_option_str.=<<<DOC_HTML
+<option value="$i" $selected_str>$sort_key_names[$i]</option>
+DOC_HTML;
+   }
+   $sort_key_str = <<<DOC_HTML
+<select onchange="post_to_url('index.php', {'sort_key':this.value});">
+   $sort_key_option_str
+</select>
+DOC_HTML;
+
+   $sort_type_str = <<<DOC_HTML
+<select onchange="post_to_url('index.php', {'sort_type':this.value});">
+  <option value="0" $asc_valid_str>Ascending</option>
+  <option value="1" $desc_valid_str>Descending</option>
+</select>
+
+
+
+DOC_HTML;
+
+   echo <<<DOC_HTML
 <!doctype html>
 <html lang="en">
 <head>
@@ -269,9 +372,11 @@ echo <<<DOC_HTML
    <style type="text/css">
       body{
          margin-left:50px;
+         width:1600px;
       }
       table
       {
+         width:1600px;
          padding-left:30px;
          text-align: left;
       }
@@ -304,28 +409,44 @@ echo <<<DOC_HTML
          width: 80px;
       }
       #btn-main{
+         width:90px;
       }
       #title-row{
          font-weight : bold;
       }
       #title-cell{
-         ;
+      }
+      #favorite-ctrl
+      {
+      }
+      #content-tr{
+         height:100px;
       }
    </style>
+   <script>
+      $script_post
+   </script>
 </head>
 <body>
-   <button type="button" id="btn-out" class="btn btn-info" onclick="javascript:location.href='sign_out.php'">Sign out</button><br> 
-   <p class="main-user">You have signed in as <b> ${_SESSION["email"]}</b></p>
-   <p class="main-priv">Privilege:<b>$p_class</b></p>
-   <p style='font-family:verdana;font-size:32px;font-weight: bold;'>Listing planes</p>
+   <button type="button" id="btn-out" class="btn btn-info" onclick="javascript:location.href='sign_out.php'">Sign out</button>
+   <p class="main-user">Welcome, <b> ${_SESSION["email"]}</b> !</p>
+   <form action="index.php" method="POST">
+   <p style='font-family:verdana;font-size:32px;font-weight: bold;'>$page_title</p>  
+   $btn_sheet
+   </form><br>
+   Order By:
+   $sort_key_str
+   $sort_type_str
    <table class="table table-striped ">
       <tr class="info" id="title-row">
          <td id="title-cell" style='width:50px;'>ID</td>
          <td id="title-cell">Flight Number</td>
          <td id="title-cell">Departure</td>
          <td id="title-cell">Destination</td>
+         <td id="title-cell">Price</td>
          <td id="title-cell" style='width:250px;'>Depart Date</td>
-         <td id="title-cell" style='width:250px'>Arrive Date</td> 
+         <td id="title-cell" style='width:250px;'>Arrive Date</td>
+         <td id="favorite-ctrl" >Favorite</td> 
          $p_extra_th
       </tr>
       $plane_str_list 
@@ -409,11 +530,11 @@ function insert_new_plane($post)
 {
    $db = \lct\func\create_db_link();
    if($db){
-      $sql = "INSERT INTO `Flight` (flight_number,departure,destination,departure_date,depart_hour,depart_min,arrival_date,arrive_hour,arrive_min)"
-        . " VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
+      $sql = "INSERT INTO `Flight` (flight_number,departure,destination,price,departure_date,depart_hour,depart_min,arrival_date,arrive_hour,arrive_min)"
+        . " VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
       $sth = $db->prepare($sql);
       #echo "SQL:$sql";
-      $result = $sth->execute(array(escape_html_tag(($post['flight_num'])),escape_html_tag($post['depart']),escape_html_tag($post['dest']),$post['depart_date'],$post['depart_hour'],$post['depart_min'],$post['arrive_date'],$post['arrive_hour'],$post['arrive_min']));
+      $result = $sth->execute(array(escape_html_tag(($post['flight_num'])),escape_html_tag($post['depart']),escape_html_tag($post['dest']),$post['price'],$post['depart_date'],$post['depart_hour'],$post['depart_min'],$post['arrive_date'],$post['arrive_hour'],$post['arrive_min']));
       #echo "Result:$result";
       return $result;
    }
@@ -433,6 +554,7 @@ function update_plane($post)
          flight_number = ?,
          departure = ?,
          destination = ?,
+         price = ?,
          departure_date = ?,
          depart_hour = ?,
          depart_min = ?,
@@ -442,7 +564,7 @@ function update_plane($post)
         . " WHERE `Flight`.`id`=? ";
       $sth = $db->prepare($sql);
       #echo "SQL:$sql";
-      $result = $sth->execute(array(escape_html_tag($post['flight_num']),escape_html_tag($post['depart']),escape_html_tag($post['dest']),$post['depart_date'],$post['depart_hour'],$post['depart_min'],$post['arrive_date'],$post['arrive_hour'],$post['arrive_min'],$post['btn_save']));
+      $result = $sth->execute(array(escape_html_tag($post['flight_num']),escape_html_tag($post['depart']),escape_html_tag($post['dest']),$post['price'],$post['depart_date'],$post['depart_hour'],$post['depart_min'],$post['arrive_date'],$post['arrive_hour'],$post['arrive_min'],$post['btn_save']));
       #echo "Result:$result";
       return $result;
    }
@@ -492,7 +614,7 @@ function load_plane_data($id)
          $sth->execute(array("$id"));
       }
       else{
-         $sql = "SELECT * FROM `Flight` ORDER BY  `id` ASC";
+         $sql = \lct\func\get_sort_sql();
          $sth = $db->prepare($sql);
          $sth->execute();
       }
@@ -505,6 +627,7 @@ function load_plane_data($id)
          $info['num'] = escape_html_tag($result->flight_number);
          $info['depart'] = escape_html_tag($result->departure);
          $info['dest'] = escape_html_tag($result->destination);
+         $info['price'] = $result->price;
          $info['depart_d'] = strtok($result->departure_date," ");
          $info['depart_h'] = $result->depart_hour;
          $info['depart_m'] = $result->depart_min;
@@ -522,11 +645,31 @@ function load_plane_data($id)
 }
 
 
-if ($_SESSION["email"])
+if (\lct\func\check_user_valid($_SESSION["email"]))
 {
    #var_dump($_POST);
-   
-   if($_POST['btn_save'] && $_SESSION['is_admin']>0)
+   if(isset($_POST['sort_type'])){
+      \lct\func\set_sort_type($_POST['sort_type']);
+   }
+   if(isset($_POST['sort_key'])){ 
+      \lct\func\set_sort_key($_POST['sort_key']);
+   }
+   if($_POST['btn_favorite'])
+   {
+      \lct\func\favorite_flight($_SESSION['email'],$_POST['btn_favorite']);
+      #echo "Favorite:${_POST['btn_favorite']}";
+      show_signed_in_page();
+   }
+   else if($_POST['btn_sheet']){
+      if($_POST['btn_sheet']=="on"){
+         $_SESSION['sheet'] = true;
+      }
+      else{
+         $_SESSION['sheet'] = false;
+      }
+      show_signed_in_page();
+   }
+   else if($_POST['btn_save'] && $_SESSION['is_admin']>0)
    {
       #echo "UPDATE!";
       if(check_array_str_valid($_POST))

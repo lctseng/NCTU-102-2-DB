@@ -1,6 +1,7 @@
 <?php
 session_save_path("./sessions");
 session_start();
+require_once("./functions/Database.php");
 require_once("./functions/IOProcessing.php");
 
 function show_err_page($err_title,$err_msg = "")
@@ -74,8 +75,8 @@ DOC_HTML;
 
 
 
-
 $db_data = @\lct\func\load_db_data();
+
 
 if($db_data)
 {
@@ -127,8 +128,7 @@ if($db_data)
             {
                $hash_pass = $obj->password;
                if(\lct\func\pwd_hash($user_email,$user_pass)===$hash_pass){
-                  $_SESSION['email'] = $user_email;
-                  $_SESSION['is_admin'] = $obj->is_admin;
+                  \lct\func\on_login($user_email,$obj->id,$obj->is_admin,false);
                   show_success_page();
                }
                else
@@ -152,6 +152,7 @@ if($db_data)
 }
 else
 {
+   echo "ERR!";
    show_err_page("Database Info Error!","Cannot load database connection info.");
 }
    
