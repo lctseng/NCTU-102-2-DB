@@ -108,6 +108,7 @@ function get_uid($uname){
       }
       else
       {
+         echo "$uname UID ERROR!";
          return false;
 
       }
@@ -178,22 +179,41 @@ function favorite_flight($uname,$fid)
    }
 }
 
-function load_sheet_plane_data($uname)
+function get_sheet_where_data($uid){
+   $where_data = get_where_data();
+   $sql = $where_data['sql'];
+   if($sql==""){ 
+      $sql .= "WHERE `id` IN (SELECT `flight_id` FROM `CompareSheet` WHERE `user_id` = $uid)";
+   }
+   else{
+      $sql .= " AND `id` IN (SELECT `flight_id` FROM `CompareSheet` WHERE `user_id` = $uid)";
+   }
+   $where_data['sql'] = $sql;
+   return $where_data;
+
+}
+
+function get_sheet_sort_sql($uid)
 {
-   $uid = get_uid($uname);
+   $where_data = get_sheet_where_data($uid);
+   $where_sql = $where_data['sql'];
+   $where_args = $where_data['args'];
+   $sort_sql = get_append_sort_sql(); 
+   $sql = "SELECT * FROM `Flight` $where_sql  $sort_sql";
+   return array("sql"=>$sql,"args"=>$where_args);
+}
+
+function load_sheet_plane_data($uid)
+{
    $db =  create_db_link();
    if($db)
    {
-      if($id && $id > 0){
-         $sql = "SELECT * FROM `Flight` WHERE `id` = ?";
-         $sth = $db->prepare($sql);
-         $sth->execute(array("$id"));
-      }
-      else{
-         $sql = "SELECT * FROM `Flight` ORDER BY  `id` ASC";
-         $sth = $db->prepare($sql);
-         $sth->execute();
-      }
+      $sql_data = get_sheet_sort_sql($uid);
+      $sql = $sql_data['sql'];
+      $sth = $db->prepare($sql);
+      $sth->execute($sql_data['args']);
+
+         
       #echo $sql;
       $list = array();
       while($result = $sth->fetchObject())
@@ -220,12 +240,17 @@ function load_sheet_plane_data($uname)
 
 }
 
+
+function is_sheet(){
+   return $_SESSION['sheet'];
+}
 function on_login($uname,$uid,$right,$sheet)
 {
    $_SESSION['email'] = $uname;
    $_SESSION['uid'] = $uid;
    $_SESSION['is_admin'] = $right;
    $_SESSION['sheet'] = $sheet;
+   $_SESSION['search'] = array('key'=>-1,'word'=>"");
    get_sort_way($uid);
 }
 
@@ -253,11 +278,48 @@ function get_sort_way($uid)
    }   
 }
 
+function set_search($key,$word){
+   $_SESSION['search']['key'] = $key;
+   $_SESSION['search']['word'] = $word;
+}
+
+function sql_escape($str){
+   return $str;
+}
+
+function get_where_data()
+{
+   $sql = "";
+   $args = array();
+   $_SESSION['search']['word'] = sql_escape($_SESSION['search']['word']);
+   switch($_SESSION['search']['key']){
+   case 0:
+      $sql = "WHERE `flight_number` like ?";
+      array_push($args,'%'.$_SESSION['search']['word']. '%');
+      break;
+   case 1:
+      $sql = "WHERE `departure` like ?";
+      array_push($args,'%'.$_SESSION['search']['word']. '%');
+      break;
+   case 2:
+      $sql = "WHERE `destination` like ?";
+      array_push($args,'%'.$_SESSION['search']['word']. '%');
+      break;
+   default:
+      $sql = "";
+      break;
+   }
+   return array("sql"=>$sql,"args"=>$args);
+}
+
 function get_sort_sql()
 {
+   $where_data = get_where_data();
+   $where_sql = $where_data['sql'];
+   $where_args = $where_data['args'];
    $sort_sql = get_append_sort_sql(); 
-   $sql = "SELECT * FROM `Flight` $sort_sql";
-   return $sql;
+   $sql = "SELECT * FROM `Flight` $where_sql  $sort_sql";
+   return array("sql"=>$sql,"args"=>$where_args);
 }
 
 function get_append_sort_sql()

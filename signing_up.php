@@ -99,7 +99,7 @@ if($db_data)
       $user_email = $_POST['email'];
       $user_pass = $_POST['password'];
       $user_pass_c = $_POST['password_confirm'];
-      $user_admin = $_POST['is_admin'];
+      #$user_admin = $_POST['is_admin'];
       
       if(!\lct\func\account_check($user_email)){
          show_err_page("Account Format Error","Account cannot contain space, and it cannot be empty.");
@@ -117,10 +117,10 @@ if($db_data)
 
          # Convert admin bit
          $is_admin = 0;
-         if($user_admin==="on")
-         {
-            $is_admin = 1;
-         }
+         #if($user_admin==="on")
+         #{
+         #   $is_admin = 1;
+         #}
          # SQL
          $sql = "INSERT INTO `User` (account,password,is_admin)"
               . " VALUES(?, ?, ?)";

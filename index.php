@@ -127,8 +127,10 @@ function show_signed_in_page(){
    $admin = false;
    $p_extra_th = "";
    $P_extra_td_show = "";
-   if($_SESSION["is_admin"]>0)
+   $total_width = "1300px";
+   if($_SESSION["is_admin"]>0&&!\lct\func\is_sheet())
    {
+      $total_width = "1600px";
       $admin = true;
       $p_class = "Administrator";
       $extra_button=<<<EXTRA_HTML
@@ -158,7 +160,7 @@ EXTRA_HTML;
    # Plane list
    $plane_str_list = "";
    if($_SESSION['sheet']){
-      $plane_data = \lct\func\load_sheet_plane_data($_SESSION['email']);
+      $plane_data = \lct\func\load_sheet_plane_data($_SESSION['uid']);
    }
    else{
       $plane_data = load_plane_data(false);
@@ -304,7 +306,7 @@ DOC_HTML;
    if($_SESSION['sheet']){
       $page_title="Compare Sheet";
       $btn_sheet.=<<<DOC_HTML
-<button type="submit" name="btn_sheet" class="btn btn-success" value="off">Flight List
+<button type="submit" name="btn_sheet" class="btn btn-success" value="off">Goto Flight List
 </button>
 DOC_HTML;
 
@@ -312,7 +314,7 @@ DOC_HTML;
    else{
       $page_title="Flight List";
       $btn_sheet .= <<<DOC_HTML
-<button type="submit" name="btn_sheet" class="btn btn-primary" value="on">Compare Sheet
+<button type="submit" name="btn_sheet" class="btn btn-primary" value="on">Goto Compare Sheet
 </button>
 
 
@@ -360,7 +362,22 @@ DOC_HTML;
 
 
 DOC_HTML;
+   $search_sel_0 = "";
+   $search_sel_1 = "";
+   $search_sel_2 = "";
+   switch($_SESSION['search']['key']){
+   case -1:case 0:default:
+      $search_sel_0 = "selected";
+      break;
+   case 1:
+      $search_sel_1 = "selected";
+      break;
+   case 2:
+      $search_sel_2 = "selected";
+      break;
+   }
 
+   $pre_word = '"'.$_SESSION['search']['word'].'"';
    echo <<<DOC_HTML
 <!doctype html>
 <html lang="en">
@@ -372,11 +389,11 @@ DOC_HTML;
    <style type="text/css">
       body{
          margin-left:50px;
-         width:1600px;
+         width:$total_width;
       }
       table
       {
-         width:1600px;
+         width:$total_width;
          padding-left:30px;
          text-align: left;
       }
@@ -431,12 +448,25 @@ DOC_HTML;
    <button type="button" id="btn-out" class="btn btn-info" onclick="javascript:location.href='sign_out.php'">Sign out</button>
    <p class="main-user">Welcome, <b> ${_SESSION["email"]}</b> !</p>
    <form action="index.php" method="POST">
-   <p style='font-family:verdana;font-size:32px;font-weight: bold;'>$page_title</p>  
-   $btn_sheet
+   <p style='font-family:verdana;font-size:32px;font-weight: bold;'>$page_title  
+   $btn_sheet </p>
    </form><br>
    Order By:
    $sort_key_str
-   $sort_type_str
+   $sort_type_str<br>
+   <form action="index.php" method="post" class="form-search">
+      Search:
+      <select name="search_key">
+         <option value="0" $search_sel_0>Flight Number</option> 
+         <option value="1" $search_sel_1>Departure</option>
+         <option value="2" $search_sel_2>Destination</option>
+      </select>
+      <div class="input-append">
+         <input type="text" name="search_word" value=$pre_word class="span2 search-query"> 
+         <button type="submit" class="btn btn-primary" name="btn_search" value="on">Search</button>
+      </div>
+      <button name="btn_end_search" class="btn btn-danger" value="on">End Search</button>
+   </form>
    <table class="table table-striped ">
       <tr class="info" id="title-row">
          <td id="title-cell" style='width:50px;'>ID</td>
@@ -614,9 +644,10 @@ function load_plane_data($id)
          $sth->execute(array("$id"));
       }
       else{
-         $sql = \lct\func\get_sort_sql();
+         $sql_data = \lct\func\get_sort_sql();
+         $sql = $sql_data['sql'];
          $sth = $db->prepare($sql);
-         $sth->execute();
+         $sth->execute($sql_data['args']);
       }
       #echo $sql;
       $list = array();
@@ -648,6 +679,12 @@ function load_plane_data($id)
 if (\lct\func\check_user_valid($_SESSION["email"]))
 {
    #var_dump($_POST);
+   if($_POST['btn_end_search']){
+      \lct\func\set_search(-1,"");
+   }
+   else if($_POST['btn_search']){
+      \lct\func\set_search($_POST['search_key'],$_POST['search_word']);  
+   }
    if(isset($_POST['sort_type'])){
       \lct\func\set_sort_type($_POST['sort_type']);
    }

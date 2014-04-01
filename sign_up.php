@@ -43,7 +43,7 @@
          <input type="password" name="password"><br>
          Password confirmation<br>
          <input type="password" name="password_confirm"><br>
-         <input type="checkbox" name="is_admin"> Is Admin?<br>
+         <!--<input type="checkbox" name="is_admin"> Is Admin?<br>-->
          <button class="btn btn-info btn-large" type="submit">Sign up</button>
       </form>
       <a href="index.php">Sign in</a>
