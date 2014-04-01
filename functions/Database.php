@@ -97,6 +97,26 @@ function fetch_user_data_by_id($uid){
    }
 }
 
+function get_user_list()
+{
+   $info_list=array();
+   $db = create_db_link();
+   if($db){
+      $sql = "SELECT * FROM `User`";
+      $sth = $db->prepare($sql);
+      $sth->execute();
+      while($result=$sth->fetchObject()){
+         $info = array();
+         $info['id'] = $result->id;
+         $info['account'] = $result->account;
+         $info['is_admin'] = $result->is_admin;
+         array_push($info_list,$info);
+      }
+   }
+   return $info_list;
+}
+
+
 function get_uid($uname){ 
    $db = create_db_link();
    if($db){
