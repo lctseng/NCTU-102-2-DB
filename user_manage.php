@@ -5,7 +5,26 @@ require_once('./functions/Database.php');
 require_once('./functions/IOProcessing.php');
 
 
-show_valid_page();
+
+if(\lct\func\check_user_valid($_SESSION['email']) && $_SESSION['is_admin']>0){
+   $_SESSION['error_msg'] = "";
+   if($_POST['btn_add']==="on"){
+      $add_result = \lct\func\add_user($_POST['new_account'],$_POST['pwd_1'],$_POST['pwd_2'],$_POST['is_admin']);
+      $_SESSION['error_msg'] = $add_result['error_msg'];
+   }
+   else if(isset($_POST['btn_delete'])){
+      \lct\func\delete_user($_POST['btn_delete']);
+   }
+   else if(isset($_POST['btn_promote'])){
+      \lct\func\promote_user($_POST['btn_promote']);
+   }
+   show_valid_page();
+}
+else{ 
+   show_err_page("Permission Denied","Only admin can do user manage.");
+}
+
+
 
 function show_valid_page(){
    
@@ -35,18 +54,22 @@ DOC_HTML;
       }
 
       # Delete
-      $delete = <<<DOC_HTML
+      if($_SESSION['uid']==$info['id']){
+         $delete = '<a id="btn-main" class="btn btn-large disabled" style="width:60px;">Invalid</a>';
+      }
+      else{
+         $delete = <<<DOC_HTML
 <form action="user_manage.php" method="post"> 
-   <button type="submit" name="btn_delete" class="btn btn-danger btn-large" value="${info['id']}">Delete</button>
+   <button type="submit" name="btn_delete" class="btn btn-danger btn-large" style="width:100px;" value="${info['id']}">Delete</button>
 </form>
 
 DOC_HTML;
-
+      } 
       $tr_list_str .= sprintf($format_show,$info['id'],$info['account'],$ident,$prom,$delete);
    }
    
-   $error_msg = "Error MESSAGE";
-   
+   $error_msg = $_SESSION['error_msg'];
+   $_SESSION['error_msg'] = "";  
    echo <<<DOC_HTML
 <!doctype html>
 <html lang="en">
@@ -108,8 +131,7 @@ DOC_HTML;
    <button type="button" id="btn-out" class="btn btn-info" onclick="javascript:location.href='sign_out.php'">Sign out</button>
    <p class="main-user">Welcome, <b> ${_SESSION["email"]}</b> !</p>
    <p style='font-family:verdana;font-size:32px;font-weight: bold;'>User Management   
-   <form action="index.php" method="POST" class="form-inline">
-   <form action="user_manage.php" method="post">
+   <form action="user_manage.php" method="post" class="form-inline">
       <fieldset>
          <legend>Add New User & Modify</legend>
          <label>Add New User : </label><label id="error-msg">$error_msg</label><br>
@@ -117,10 +139,11 @@ DOC_HTML;
          <input type="password" name="pwd_1" placeholder="Password"></input>
          <input type="password" name="pwd_2" placeholder="Pwd Confirm"></input>
          <label class="checkbox">
-            <input type="checkbox"> is Admin
+            <input type="checkbox" name="is_admin"> is Admin
          </label>
          <br></br>
-         <button type="submit" class="btn btn-primary">Add User</button>
+         <button type="submit" name="btn_add" value="on" class="btn btn-primary">Add User</button>
+         <button type="button"  class="btn btn-success" onclick="javascript:location.href='index.php'">Back to Flight List</button>
       </fieldset>
    </form>
    <table class="table table-striped ">
@@ -138,6 +161,44 @@ DOC_HTML;
 
 </html>
 DOC_HTML;
+}
+
+
+
+function show_err_page($err_title,$err_msg = "")
+{
+   echo <<<ERR_HTML
+<!doctype html>
+<html lang="en">
+   <head>
+      <meta charset="utf-8" http-equiv="refresh" content="3; url=user_manage.php">
+      <title>User Management Error</title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <link href="bootstrap/css/bootstrap.css" rel="stylesheet">
+      <style>
+      body {
+        padding-left: 50px;
+        padding-top: 40px;
+        padding-bottom: 40px;
+        background-color: #f5f5f5;
+        background-attachment: fixed; 
+        background-image: url("img/character.png"); 
+        background-repeat: no-repeat; 
+      }
+      </style>
+   </head>
+   <body>
+      <h1>$err_title</h1>
+      <p>$err_msg</p>
+      <p>Try again!</p>
+      <p>Redirect in 3 seconds...</p>
+      <a href="user_manage.php">Back to user management page</a><br>
+   </body>
+</html>
+
+
+
+ERR_HTML;
 }
 
 

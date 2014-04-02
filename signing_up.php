@@ -100,8 +100,13 @@ if($db_data)
       $user_pass = $_POST['password'];
       $user_pass_c = $_POST['password_confirm'];
       #$user_admin = $_POST['is_admin'];
-      
-      if(!\lct\func\account_check($user_email)){
+      if(strlen(\lct\func\escape_html_tag($user_email))!=strlen($user_email)){
+         show_err_page("Account Format Error","Account cannot contain illegal characters.");
+      }
+      else if(strlen(\lct\func\escape_html_tag($user_pass))!=strlen($user_pass)){
+         show_err_page("Password Format Error","Password cannot contain illegal characters.");
+      }
+      else if(!\lct\func\account_check($user_email)){
          show_err_page("Account Format Error","Account cannot contain space, and it cannot be empty.");
       }
       else if($user_pass !== $user_pass_c) # Password Same Check

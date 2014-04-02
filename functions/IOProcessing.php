@@ -60,7 +60,10 @@ DOC_HTML;
 }
 
 
-
+function escape_html_tag($str)
+{
+   return strip_tags($str);
+}
 
 
 ?>

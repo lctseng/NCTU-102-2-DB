@@ -135,6 +135,8 @@ function show_signed_in_page(){
       $p_class = "Administrator";
       $extra_button=<<<EXTRA_HTML
 <button type="button" id="btn-new" class="btn btn-success" onclick="javascript:location.href='new_plane.php'">New Plane</button>
+<button type="button" id="btn-new" class="btn btn-success" onclick="javascript:location.href='user_manage.php'">User Management</button>
+<button type="button" id="btn-new" class="btn btn-success" onclick="javascript:location.href='airport_manage.php'">Airport Management</button>
 EXTRA_HTML;
       $p_extra_th=<<<EXTRA_HTML
 <td></td>
@@ -258,6 +260,7 @@ EXTRA_HTML;
 </tr>
 DOC_HTML;
    #var_dump($_POST);
+
    foreach ($plane_data as $info):      
       
       $favorite_btn = "";
@@ -265,10 +268,12 @@ DOC_HTML;
       $favorite_btn_text = "";
       if(\lct\func\is_favorite($_SESSION['uid'],$info['id']))
       {
+         $favorite_img="<img src='img/InFavorite.png'>";
          $favorite_btn_class .= "btn btn-warning btn-large";
          $favorite_btn_text .= "Cancel";
       }
       else{ 
+         $favorite_img="<img src='img/UnFavorite.png'>";
          $favorite_btn_class .= "btn btn-success btn-large";
          $favorite_btn_text .= "Favorite";
       }
@@ -299,7 +304,7 @@ DOC_HTML;
       if($admin&&$_POST['btn_modify'] && $_POST['btn_modify']==$info['id']){
          $format = $format_modify;
       }
-      $plane_str_list.=sprintf($format,$info['id'],$info['num'],$info['depart'],$info['dest'],$info['price'],$info['depart_d'],$info['depart_h'],$info['depart_m'],$info['arrive_d'],$info['arrive_h'],$info['arrive_m'],$info['id'],$info['id'],$info['id']); 
+      $plane_str_list.=sprintf($format,$info['id']." $favorite_img",$info['num'],$info['depart'],$info['dest'],$info['price'],$info['depart_d'],$info['depart_h'],$info['depart_m'],$info['arrive_d'],$info['arrive_h'],$info['arrive_m'],$info['id'],$info['id'],$info['id']); 
    endforeach;   
 
    $btn_sheet = "";
@@ -709,14 +714,20 @@ if (\lct\func\check_user_valid($_SESSION["email"]))
    else if($_POST['btn_save'] && $_SESSION['is_admin']>0)
    {
       #echo "UPDATE!";
-      if(check_array_str_valid($_POST))
+      if(!check_array_str_valid($_POST))
       {
-         $sql_result = update_plane($_POST);
-         show_signed_in_page();
+         show_err_page("Data Format Error!","All field must not be empty,and cannot contain only spaces.Or maybe there exist illegal characters.","index.php","main page");
+      }
+      else if(!\lct\func\check_airport_valid($_POST['depart'])){
+         show_err_page("Departrue Airport Does Not Exist","Airport must be in airport list.","index.php","main page");
+      } 
+      else if(!\lct\func\check_airport_valid($_POST['dest'])){
+         show_err_page("Destination Airport Does Not Exist","Airport must be in airport list.","index.php","main page");
       } 
       else
       {
-         show_err_page("Data Format Error!","All field must not be empty,and cannot contain only spaces.Or maybe there exist illegal characters.","index.php","main page");
+         $sql_result = update_plane($_POST);
+         show_signed_in_page();
       }
       #UPDATE  `Flight` SET  `destination` =  '8' WHERE  `Flight`.`id` =1;
    }
@@ -735,8 +746,18 @@ if (\lct\func\check_user_valid($_SESSION["email"]))
    else if($_POST["btn_trigger"] && $_SESSION['is_admin']>0)
    {
       unset($_POST['btn_trigger']);
-      if(check_array_str_valid($_POST))
+      if(!check_array_str_valid($_POST))
       {
+         show_err_page("Data Format Error!","All field must not be empty,and cannot contain only spaces.Or maybe there exist illegal characters.","new_plane.php","plane adding page");
+      }
+      # Process SQL
+      else if(!\lct\func\check_airport_valid($_POST['depart'])){
+         show_err_page("Departrue Airport Does Not Exist","Airport must be in airport list.","new_plane.php","plane adding page");
+      } 
+      else if(!\lct\func\check_airport_valid($_POST['dest'])){
+         show_err_page("Destination Airport Does Not Exist","Airport must be in airport list.","new_plane.php","plane adding page");
+      } 
+      else{ 
          $sql_result = insert_new_plane($_POST);
          if($sql_result)
          {
@@ -747,11 +768,6 @@ if (\lct\func\check_user_valid($_SESSION["email"]))
             show_err_page("Server Error!","Maybe the data is corrupt.","new_plane.php","plane adding page");
          }
       }
-      else
-      {
-         show_err_page("Data Format Error!","All field must not be empty,and cannot contain only spaces.Or maybe there exist illegal characters.","new_plane.php","plane adding page");
-      }
-      # Process SQL
    } 
    else{
       show_signed_in_page();

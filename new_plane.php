@@ -100,7 +100,7 @@ function show_err_page($err_title,$err_msg = "")
 <html lang="en">
    <head>
       <meta charset="utf-8" http-equiv="refresh" content="3; url=index.php">
-      <title>Sign Up Error</title>
+      <title>Add Plane Error</title>
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <link href="bootstrap/css/bootstrap.css" rel="stylesheet">
       <style>

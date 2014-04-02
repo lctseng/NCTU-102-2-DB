@@ -53,6 +53,65 @@ function check_user_exist_DB($uname)
    }
 }
 
+function add_user($uname,$pwd,$pwd_confirm,$admin){
+   $add_result = false;
+   $error_msg = "";
+   if(!\lct\func\account_check($uname)){ # Check account format
+      $error_msg = "Account cannot contains space, and it cannot be empty.";
+   }
+   else if(strlen($pwd)==0 || strlen($pwd_confirm)==0){
+      $error_msg = "Password cannot be empty.";
+   }
+   else if($pwd !== $pwd_confirm) # Password Same Check
+   {
+      $error_msg = "Password not match.";
+   }
+   else if(strlen(\lct\func\escape_html_tag($uname))!=strlen($uname)){
+      $error_msg = "Account cannot contains illegal characters.";
+   }
+   else if(strlen(\lct\func\escape_html_tag($pwd))!=strlen($pwd)){
+      $error_msg = "Password cannot contains illegal characters.";
+   }
+   else{
+         #Convert admin bit
+         $is_admin = 0;
+         if($admin==="on")
+         {
+            $is_admin = 1;
+         }
+         # SQL
+         $db = create_db_link();
+         $sql = "INSERT INTO `User` (account,password,is_admin)"
+              . " VALUES(?, ?, ?)";
+         $sth = $db->prepare($sql);
+         $result = $sth->execute(array($uname,\lct\func\pwd_hash($uname,$pwd),$is_admin));
+         if($result){
+            $add_result = true;
+         }
+         else{
+            $error_msg = "Account already in use.";
+         }
+   }
+   return array("result"=>$add_result,"error_msg"=>$error_msg);
+}
+
+function delete_user($uid){
+   $db = create_db_link();
+   if($db){
+      $sql = "DELETE FROM `User` WHERE `id` = ?";
+      $sth = $db->prepare($sql);
+      $sth->execute(array($uid));
+   }
+}
+
+function promote_user($uid){
+   $db = create_db_link();
+   if($db){
+      $sql = "UPDATE `User` SET `is_admin` = 1 WHERE `id` = ? ";
+      $sth = $db->prepare($sql);
+      $sth->execute(array($uid));
+   }
+}
 
 function check_user_valid($uname)
 {
@@ -114,6 +173,141 @@ function get_user_list()
       }
    }
    return $info_list;
+}
+
+function get_airport_list(){
+   $info_list = array();
+   $db = create_db_link();
+   if($db){
+      $sql = "SELECT * FROM `Airport`";
+      $sth = $db->prepare($sql);
+      $sth->execute();
+      while($result = $sth->fetchObject()){
+         $info = array();
+         $info['id'] = $result->id;
+         $info['name'] = $result->name;
+         $info['longitude'] = $result->longitude;
+         $info['latitude'] = $result->latitude;
+         array_push($info_list,$info); 
+      }
+   }
+   return $info_list;
+   
+}
+
+function add_airport($name,$longitude,$latitude){
+   $add_result = false;
+   $error_msg = "";
+   if(strlen($name)==0){
+      $error_msg = "Name cannot be empty.";
+   }
+   else if(strlen(\lct\func\escape_html_tag($name))!=strlen($name)){
+      $error_msg = "Name cannot contains illegal characters.";
+   }
+   else if(!\lct\func\account_check($name)){
+      $error_msg = "Name cannot contain only spaces.";
+   }
+   else if($longitude>180.0 || $longitude<-180.0){
+      $error_msg = "Longitude must set between -180.0 to 180.0";
+   }
+   else if($latitude>90.0 || $latitude<-90.0){
+      $error_msg = "Latitude must set between -90.0 to 90.0";
+   }
+   else{
+      $db = create_db_link();
+
+      if($db)
+      {
+         $sql = "INSERT INTO `Airport` (name,longitude,latitude) VALUES (?,?,?)";
+         $sth = $db->prepare($sql);
+         $result = $sth->execute(array($name,$longitude,$latitude));
+         if($result){
+            $add_result = true;
+            $error_msg = "";
+         }
+         else{
+            $error_msg = "Airport Name already exists!";
+         }
+      }
+      else{
+         $error_msg = "Database Error!";
+      }
+   }
+   return array("result"=>$add_result,"error_msg"=>$error_msg);
+}
+
+function delete_airport($id){
+   $db = create_db_link();
+   if($db){
+      $sql = "DELETE FROM `Airport` WHERE `id` = ?";
+      $sth = $db->prepare($sql);
+      $sth->execute(array($id));
+   }
+}
+
+function edit_airport($id,$name,$longitude,$latitude){
+   $add_result = false;
+   $error_msg = "";
+   if(strlen($name)==0){
+      $error_msg = "Name cannot be empty.";
+   }
+   else if(strlen(\lct\func\escape_html_tag($name))!=strlen($name)){
+      $error_msg = "Name cannot contains illegal characters.";
+   }
+   else if(!\lct\func\account_check($name)){
+      $error_msg = "Name cannot contain only spaces.";
+   }
+   else if($longitude>180.0 || $longitude<-180.0){
+      $error_msg = "Longitude must set between -180.0 to 180.0";
+   }
+   else if($latitude>90.0 || $latitude<-90.0){
+      $error_msg = "Latitude must set between -90.0 to 90.0";
+   }
+   else{
+      $db = create_db_link();
+
+      if($db)
+      {
+         $sql = "UPDATE `Airport` SET
+            `name` = ?,
+            `longitude` = ?,
+            `latitude` = ?
+             WHERE `id` = ?
+            ";
+         $sth = $db->prepare($sql);
+         $result = $sth->execute(array($name,$longitude,$latitude,$id));
+         if($result){
+            $add_result = true;
+            $error_msg = "";
+         }
+         else{
+            $error_msg = "Cannot wirte to Database!";
+         }
+      }
+      else{
+         $error_msg = "Database Error!";
+      }
+   }
+   return array("result"=>$add_result,"error_msg"=>$error_msg);
+}
+
+function check_airport_valid($airport){
+   # Check whether in DB or not
+   $db = create_db_link();
+   if($db){
+      $sql = "SELECT `id` FROM `Airport` WHERE `name` = ?";
+      $sth = $db->prepare($sql);
+      $sth->execute(array($airport));
+      if($sth->fetchObject()){
+         return true;
+      }
+      else{
+         return false;
+      }
+   }
+   else{
+      return false;
+   }
 }
 
 
