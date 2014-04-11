@@ -82,7 +82,7 @@ function show_add_new_page()
             $min_cmd_str
          </select><br>
          <input type="submit" class="btn btn-primary"  name="btn_trigger" value="Create Plane">
-         <button type="button" class="btn btn-primary"  onclick="javascript:location.href='index.php'">Cancel</button>
+         <button type="button" class="btn btn-danger"  onclick="javascript:location.href='index.php'"><i class="icon-ban-circle icon-white"></i> Cancel</button>
       </form>
    </body>
 

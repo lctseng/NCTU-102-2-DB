@@ -174,7 +174,7 @@ DOC_HTML;
    </script>
 </head>
 <body>
-   <button type="button" id="btn-out" class="btn btn-info" onclick="javascript:location.href='sign_out.php'">Sign out</button>
+   <button type="button" id="btn-out" class="btn btn-info" onclick="javascript:location.href='sign_out.php'"><i class="icon-refresh icon-white"></i> Sign out</button>
    <p class="main-user">Welcome, <b> ${_SESSION["email"]}</b> !</p>
    <p style='font-family:verdana;font-size:32px;font-weight: bold;'>Airport Management   
    <form action="airport_manage.php" method="post" class="form-inline">
@@ -185,12 +185,12 @@ DOC_HTML;
          <input type="number" step=0.000001  name="longitude" placeholder="Longitude"></input>
          <input type="number" step=0.000001  name="latitude" placeholder="Latitude"></input>
          <br></br>
-         <button type="submit" name="btn_add" value="on" class="btn btn-primary">Add Airport</button>
-         <button type="button"  class="btn btn-success" onclick="javascript:location.href='index.php'">Back to Flight List</button>
+         <button type="submit" name="btn_add" value="on" class="btn btn-primary"><i class="icon-map-marker icon-white"></i> Add Airport</button>
+         <button type="button"  class="btn btn-success" onclick="javascript:location.href='index.php'"><i class="icon-th-list icon-white"></i> Back to Flight List</button>
          <label id="error-msg">$edit_error_msg</label><br>
       </fieldset>
    </form>
-   <table class="table table-striped ">
+   <table class="table table-hover ">
       <tr class="info" id="title-row">
          <td id="title-cell">ID</td>
          <td id="title-cell">Name</td>

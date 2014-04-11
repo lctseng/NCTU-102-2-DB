@@ -91,9 +91,9 @@ function show_sign_in_page()
             <h1 class="welcome">Flight Schedule System</h1>
             <form action="signing_in.php" method="POST" class="form-signin"> 
                <h1 class="signin-head">Sign in</h1>
-               Email<br>
+               <i class="icon-bookmark"></i>Account<br>
                <input type="text" name="email"><br>
-               Password<br>
+               <i class="icon-certificate"></i>Password<br>
                <input type="password" name="password"><br>
                <input type="checkbox" name="remember" class="checkbox"> Remember me<br>
                <button type="submit" class="btn btn-large btn-primary">Sign in</button>
@@ -134,9 +134,9 @@ function show_signed_in_page(){
       $admin = true;
       $p_class = "Administrator";
       $extra_button=<<<EXTRA_HTML
-<button type="button" id="btn-new" class="btn btn-success" onclick="javascript:location.href='new_plane.php'">New Plane</button>
-<button type="button" id="btn-new" class="btn btn-success" onclick="javascript:location.href='user_manage.php'">User Management</button>
-<button type="button" id="btn-new" class="btn btn-success" onclick="javascript:location.href='airport_manage.php'">Airport Management</button>
+<button type="button" id="btn-new" class="btn btn-success" onclick="javascript:location.href='new_plane.php'"><i class="icon-plane icon-white"></i> New Plane</button>
+<button type="button" id="btn-new" class="btn btn-success" onclick="javascript:location.href='user_manage.php'"><i class="icon-user icon-white"></i> User Management</button>
+<button type="button" id="btn-new" class="btn btn-success" onclick="javascript:location.href='airport_manage.php'"><i class="icon-map-marker icon-white"></i> Airport Management</button>
 EXTRA_HTML;
       $p_extra_th=<<<EXTRA_HTML
 <td></td>
@@ -311,7 +311,7 @@ DOC_HTML;
    if($_SESSION['sheet']){
       $page_title="Compare Sheet";
       $btn_sheet.=<<<DOC_HTML
-<button type="submit" name="btn_sheet" class="btn btn-success" value="off">Goto Flight List
+<button type="submit" name="btn_sheet" class="btn btn-success" value="off"><i class="icon-th-list icon-white"></i> Goto Flight List
 </button>
 DOC_HTML;
 
@@ -319,7 +319,7 @@ DOC_HTML;
    else{
       $page_title="Flight List";
       $btn_sheet .= <<<DOC_HTML
-<button type="submit" name="btn_sheet" class="btn btn-primary" value="on">Goto Compare Sheet
+<button type="submit" name="btn_sheet" class="btn btn-primary" value="on"><i class="icon-heart icon-white"></i> Goto Compare Sheet
 </button>
 
 
@@ -450,7 +450,7 @@ DOC_HTML;
    </script>
 </head>
 <body>
-   <button type="button" id="btn-out" class="btn btn-info" onclick="javascript:location.href='sign_out.php'">Sign out</button>
+   <button type="button" id="btn-out" class="btn btn-info" onclick="javascript:location.href='sign_out.php'"><i class="icon-refresh icon-white"></i> Sign out</button>
    <p class="main-user">Welcome, <b> ${_SESSION["email"]}</b> !</p>
    <form action="index.php" method="POST">
    <p style='font-family:verdana;font-size:32px;font-weight: bold;'>$page_title  
@@ -468,11 +468,11 @@ DOC_HTML;
       </select>
       <div class="input-append">
          <input type="text" name="search_word" value=$pre_word class="span2 search-query"> 
-         <button type="submit" class="btn btn-primary" name="btn_search" value="on">Search</button>
+         <button type="submit" class="btn btn-primary" name="btn_search" value="on"><i class="icon-search icon-white"></i> Search</button>
       </div>
-      <button name="btn_end_search" class="btn btn-danger" value="on">End Search</button>
+      <button name="btn_end_search" class="btn btn-danger" value="on"><i class="icon-ban-circle icon-white"></i> End Search</button>
    </form>
-   <table class="table table-striped ">
+   <table class="table table-hover ">
       <tr class="info" id="title-row">
          <td id="title-cell" style='width:50px;'>ID</td>
          <td id="title-cell">Flight Number</td>
