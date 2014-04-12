@@ -160,9 +160,11 @@ EXTRA_HTML;
 EXTRA_HTML;
    }
    # Plane list
-   $plane_str_list = "";
+   $plane_str_list = ""; 
+   $extra_plane_str_list = "";
    if($_SESSION['sheet']){
-      $plane_data = \lct\func\load_sheet_plane_data($_SESSION['uid']);
+      $plane_data = \lct\func\load_sheet_plane_data($_SESSION['uid'],true);
+      $extra_plane_data = \lct\func\load_sheet_plane_data($_SESSION['uid'],false);
    }
    else{
       $plane_data = load_plane_data(false);
@@ -260,8 +262,14 @@ EXTRA_HTML;
 </tr>
 DOC_HTML;
    #var_dump($_POST);
-
-   foreach ($plane_data as $info):      
+   $index = 0;
+   $meta_list = array($plane_data,$extra_plane_data);
+   $meta_str = array("","");
+   foreach ($meta_list as $list_data):
+   if(!isset($list_data)){
+      continue;
+   }
+   foreach ($list_data as $info):      
       
       $favorite_btn = "";
       $favorite_btn_class = "";
@@ -304,9 +312,16 @@ DOC_HTML;
       if($admin&&$_POST['btn_modify'] && $_POST['btn_modify']==$info['id']){
          $format = $format_modify;
       }
-      $plane_str_list.=sprintf($format,$info['id']." $favorite_img",$info['num'],$info['depart'],$info['dest'],$info['price'],$info['depart_d'],$info['depart_h'],$info['depart_m'],$info['arrive_d'],$info['arrive_h'],$info['arrive_m'],$info['id'],$info['id'],$info['id']); 
+      $plane_str_list.=sprintf($format,"$favorite_img ".$info['id'],$info['num'],$info['depart'],$info['dest'],$info['price'],$info['depart_d'],$info['depart_h'],$info['depart_m'],$info['arrive_d'],$info['arrive_h'],$info['arrive_m'],$info['id'],$info['id'],$info['id']); 
    endforeach;   
-
+   $meta_str[$index] = $plane_str_list;
+   $index = $index + 1;
+   $plane_str_list = "";
+   endforeach;
+   unset($index);
+   $origin_plane_str_list = $meta_str[0];
+   $extra_plane_str_list = $meta_str[1];
+   
    $btn_sheet = "";
    if($_SESSION['sheet']){
       $page_title="Compare Sheet";
@@ -383,6 +398,51 @@ DOC_HTML;
    }
 
    $pre_word = '"'.$_SESSION['search']['word'].'"';
+   
+   $ori_table_str = <<<DOC_HTML
+   <table class="table table-hover ">
+      <tr class="info" id="title-row">
+         <td id="title-cell" style='width:50px;'>ID</td>
+         <td id="title-cell">Flight Number</td>
+         <td id="title-cell">Departure</td>
+         <td id="title-cell">Destination</td>
+         <td id="title-cell">Price</td>
+         <td id="title-cell" style='width:250px;'>Depart Date</td>
+         <td id="title-cell" style='width:250px;'>Arrive Date</td>
+         <td id="favorite-ctrl" >Favorite</td> 
+         $p_extra_th
+      </tr>
+      $origin_plane_str_list 
+   </table>
+ 
+
+
+DOC_HTML;
+   $ext_table_str = "";
+   if($_SESSION['sheet'])
+   {
+      $ext_table_str = <<<DOC_HTML
+<h1>Flight Not in Favorite</h1>
+   <table class="table table-hover ">
+      <tr class="info" id="title-row">
+         <td id="title-cell" style='width:50px;'>ID</td>
+         <td id="title-cell">Flight Number</td>
+         <td id="title-cell">Departure</td>
+         <td id="title-cell">Destination</td>
+         <td id="title-cell">Price</td>
+         <td id="title-cell" style='width:250px;'>Depart Date</td>
+         <td id="title-cell" style='width:250px;'>Arrive Date</td>
+         <td id="favorite-ctrl" >Favorite</td> 
+      </tr>
+      $extra_plane_str_list
+   </table>
+
+
+
+
+
+DOC_HTML;
+   }
    echo <<<DOC_HTML
 <!doctype html>
 <html lang="en">
@@ -472,22 +532,10 @@ DOC_HTML;
       </div>
       <button name="btn_end_search" class="btn btn-danger" value="on"><i class="icon-ban-circle icon-white"></i> End Search</button>
    </form>
-   <table class="table table-hover ">
-      <tr class="info" id="title-row">
-         <td id="title-cell" style='width:50px;'>ID</td>
-         <td id="title-cell">Flight Number</td>
-         <td id="title-cell">Departure</td>
-         <td id="title-cell">Destination</td>
-         <td id="title-cell">Price</td>
-         <td id="title-cell" style='width:250px;'>Depart Date</td>
-         <td id="title-cell" style='width:250px;'>Arrive Date</td>
-         <td id="favorite-ctrl" >Favorite</td> 
-         $p_extra_th
-      </tr>
-      $plane_str_list 
-   </table>
    $extra_button
-</body>
+   $ori_table_str
+   $ext_table_str
+   </body>
 
 </html>
 

@@ -393,23 +393,29 @@ function favorite_flight($uname,$fid)
    }
 }
 
-function get_sheet_where_data($uid){
+function get_sheet_where_data($uid,$include=true){
    $where_data = get_where_data();
    $sql = $where_data['sql'];
+   if($include){
+      $include_str = "";
+   }
+   else{   
+      $include_str = "NOT";
+   }
    if($sql==""){ 
-      $sql .= "WHERE `id` IN (SELECT `flight_id` FROM `CompareSheet` WHERE `user_id` = $uid)";
+      $sql .= "WHERE `id` $include_str IN (SELECT `flight_id` FROM `CompareSheet` WHERE `user_id` = $uid)";
    }
    else{
-      $sql .= " AND `id` IN (SELECT `flight_id` FROM `CompareSheet` WHERE `user_id` = $uid)";
+      $sql .= " AND `id` $include_str IN (SELECT `flight_id` FROM `CompareSheet` WHERE `user_id` = $uid)";
    }
    $where_data['sql'] = $sql;
    return $where_data;
 
 }
 
-function get_sheet_sort_sql($uid)
+function get_sheet_sort_sql($uid,$include=true)
 {
-   $where_data = get_sheet_where_data($uid);
+   $where_data = get_sheet_where_data($uid,$include);
    $where_sql = $where_data['sql'];
    $where_args = $where_data['args'];
    $sort_sql = get_append_sort_sql(); 
@@ -417,12 +423,12 @@ function get_sheet_sort_sql($uid)
    return array("sql"=>$sql,"args"=>$where_args);
 }
 
-function load_sheet_plane_data($uid)
+function load_sheet_plane_data($uid,$include=true)
 {
    $db =  create_db_link();
    if($db)
    {
-      $sql_data = get_sheet_sort_sql($uid);
+      $sql_data = get_sheet_sort_sql($uid,$include);
       $sql = $sql_data['sql'];
       $sth = $db->prepare($sql);
       $sth->execute($sql_data['args']);
