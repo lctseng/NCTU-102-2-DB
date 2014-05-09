@@ -137,6 +137,7 @@ function show_signed_in_page(){
 <button type="button" id="btn-new" class="btn btn-success" onclick="javascript:location.href='new_plane.php'"><i class="icon-plane icon-white"></i> New Plane</button>
 <button type="button" id="btn-new" class="btn btn-success" onclick="javascript:location.href='user_manage.php'"><i class="icon-user icon-white"></i> User Management</button>
 <button type="button" id="btn-new" class="btn btn-success" onclick="javascript:location.href='airport_manage.php'"><i class="icon-map-marker icon-white"></i> Airport Management</button>
+<button type="button" id="btn-new" class="btn btn-success" onclick="javascript:location.href='country_manage.php'"><i class="icon-home icon-white"></i> Country Management</button>
 EXTRA_HTML;
       $p_extra_th=<<<EXTRA_HTML
 <td></td>

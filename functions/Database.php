@@ -346,6 +346,134 @@ function check_airport_valid($airport){
 }
 
 
+function get_country_list(){
+   $info_list = array();
+   $db = create_db_link();
+   if($db){
+      $sql = "SELECT * FROM `Country`";
+      $sth = $db->prepare($sql);
+      $sth->execute();
+      while($result = $sth->fetchObject()){
+         $info = array();
+         $info['id'] = $result->id;
+         $info['name'] = $result->name;
+         $info['full_name'] = $result->full_name;
+         array_push($info_list,$info); 
+      }
+   }
+   return $info_list;
+   
+}
+
+function add_country($name,$full_name){
+   $add_result = false;
+   $error_msg = "";
+   if(strlen($name)==0){
+      $error_msg = "Name cannot be empty.";
+   }
+   else if(strlen(\lct\func\escape_html_tag($name))!=strlen($name)){
+      $error_msg = "Name cannot contains illegal characters.";
+   }
+   else if(strlen(\lct\func\escape_html_tag($full_name))!=strlen($full_name)){
+      $error_msg = "Full Name cannot contains illegal characters.";
+   }
+   else if(!\lct\func\account_check($name)){
+      $error_msg = "Name cannot contain only spaces.";
+   }
+   else{
+      $db = create_db_link();
+
+      if($db)
+      {
+         $sql = "INSERT INTO `Country` (name,full_name) VALUES (?,?)";
+         $sth = $db->prepare($sql);
+         $result = $sth->execute(array($name,$full_name));
+         if($result){
+            $add_result = true;
+            $error_msg = "";
+         }
+         else{
+            $error_msg = "Country Name already exists!";
+         }
+      }
+      else{
+         $error_msg = "Database Error!";
+      }
+   }
+   return array("result"=>$add_result,"error_msg"=>$error_msg);
+}
+
+function delete_country($id){
+   $db = create_db_link();
+   if($db){
+      $sql = "DELETE FROM `Country` WHERE `id` = ?";
+      $sth = $db->prepare($sql);
+      $sth->execute(array($id));
+   }
+}
+
+function edit_country($id,$name,$full_name){
+   $add_result = false;
+   $error_msg = "";
+   if(strlen($name)==0){
+      $error_msg = "Name cannot be empty.";
+   }
+   else if(strlen(\lct\func\escape_html_tag($name))!=strlen($name)){
+      $error_msg = "Name cannot contains illegal characters.";
+   }
+   else if(strlen(\lct\func\escape_html_tag($full_name))!=strlen($full_name)){
+      $error_msg = "Full Name cannot contains illegal characters.";
+   }
+   else if(!\lct\func\account_check($name)){
+      $error_msg = "Name cannot contain only spaces.";
+   }
+   else{
+      $db = create_db_link();
+
+      if($db)
+      {
+         $sql = "UPDATE `Country` SET
+            `name` = ?,
+            `full_name` = ?
+             WHERE `id` = ?
+            ";
+         $sth = $db->prepare($sql);
+         $result = $sth->execute(array($name,$full_name,$id));
+         if($result){
+            $add_result = true;
+            $error_msg = "";
+         }
+         else{
+            $error_msg = "Cannot wirte to Database!";
+         }
+      }
+      else{
+         $error_msg = "Database Error!";
+      }
+   }
+   return array("result"=>$add_result,"error_msg"=>$error_msg);
+}
+
+function check_country_valid($country){
+   # Check whether in DB or not
+   $db = create_db_link();
+   if($db){
+      $sql = "SELECT `id` FROM `Country` WHERE `name` = ?";
+      $sth = $db->prepare($sql);
+      $sth->execute(array($country));
+      if($sth->fetchObject()){
+         return true;
+      }
+      else{
+         return false;
+      }
+   }
+   else{
+      return false;
+   }
+}
+
+
 function get_uid($uname){ 
    $db = create_db_link();
    if($db){
