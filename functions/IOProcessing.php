@@ -65,5 +65,15 @@ function escape_html_tag($str)
    return strip_tags($str);
 }
 
+function check_hour_valid($hour){
+   return $hour <= 12 && $hour >= -12;
+}
+
+
+function to_time_zone_display($hour){
+   # convert hour to time zone format
+   return sprintf("%+03d:00",$hour); 
+}
+
 
 ?>

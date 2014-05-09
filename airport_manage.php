@@ -4,7 +4,7 @@ session_start();
 require_once('./functions/Database.php');
 require_once('./functions/IOProcessing.php');
 
-
+# echo \lct\func\to_time_zone_display(22);
 
 if(\lct\func\check_user_valid($_SESSION['email']) && $_SESSION['is_admin']>0){
    $_SESSION['airport_error_msg'] = "";
@@ -12,7 +12,7 @@ if(\lct\func\check_user_valid($_SESSION['email']) && $_SESSION['is_admin']>0){
    #var_dump($_SESSION);
    #var_dump($_POST);
    if($_POST['btn_add']==="on"){
-      $add_result = \lct\func\add_airport($_POST['new_name'],$_POST['longitude'],$_POST['latitude']);
+      $add_result = \lct\func\add_airport($_POST['new_name'],$_POST['new_full_name'],$_POST['longitude'],$_POST['latitude'],$_POST['country'],$_POST['time_zone']);
       $_SESSION['airport_error_msg'] = $add_result['error_msg'];
    }
    else if(isset($_POST['btn_delete'])){
@@ -23,7 +23,7 @@ if(\lct\func\check_user_valid($_SESSION['email']) && $_SESSION['is_admin']>0){
    }
    else if(isset($_POST['btn_save']) && $_POST['btn_save']==$_SESSION['airport_edit_id']){
       #echo "EDIT!!";
-      $edit_result = \lct\func\edit_airport($_SESSION['airport_edit_id'],$_POST['edit_name'],$_POST['edit_longitude'],$_POST['edit_latitude']);
+      $edit_result = \lct\func\edit_airport($_SESSION['airport_edit_id'],$_POST['edit_name'],$_POST['edit_full_name'],$_POST['edit_longitude'],$_POST['edit_latitude'],$_POST['edit_country'],$_POST['edit_time_zone']);
       #echo "EDIT RESULT:";
       #var_dump($edit_result);
       if($edit_result['result']){
@@ -52,8 +52,11 @@ function show_valid_page(){
 <tr id="content-tr">
    <td>%d</td>
    <td>%s</td>
+   <td>%s</td>
    <td>%f</td>
    <td>%f</td>
+   <td>%s</td>
+   <td>%s</td>
    <td>%s</td>
    <td>%s</td>
 </tr>
@@ -74,7 +77,7 @@ DOC_HTML;
 </form>
 DOC_HTML;
 
-         $tr_list_str .= sprintf($format_show,$info['id'],$info['name'],$info['longitude'],$info['latitude'],$edit,$delete);
+         $tr_list_str .= sprintf($format_show,$info['id'],$info['name'],$info['full_name'],$info['longitude'],$info['latitude'],$info['country'],\lct\func\to_time_zone_display($info['time_zone']),$edit,$delete);
       }
       else{ ## THIS ID NEED TO BE EDIT!
          # Save
@@ -96,17 +99,26 @@ DOC_HTML;
          <input type="text" value="%s" name="edit_name" placeholder="Name"></input>
       </td>
       <td>
+         <input type="text" value="%s" name="edit_full_name" placeholder="Full Name"></input>
+      </td>
+      <td>
          <input type="number" value="%f" step=0.000001  name="edit_longitude" placeholder="Longitude"></input>
       </td>
       <td>
          <input type="number" value="%f" step=0.000001  name="edit_latitude" placeholder="Latitude"></input>
+      </td>
+      <td>
+         <input type="text" value="%s" name="edit_country" placeholder="Country"></input>
+      </td>
+      <td>
+         <input type="number" value="%d"  name="edit_time_zone" placeholder="Time Zone"></input>
       </td>
       <td>%s</td>
       <td>%s</td>
    </form>
 </tr>
 DOC_HTML;
-         $tr_list_str .= sprintf($format_modify,$info['id'],$info['name'],$info['longitude'],$info['latitude'],$save,$cancel);
+         $tr_list_str .= sprintf($format_modify,$info['id'],$info['name'],$info['full_name'],$info['longitude'],$info['latitude'],$info['country'],$info['time_zone'],$save,$cancel);
       }
    }
    $error_msg = $_SESSION['airport_error_msg'];
@@ -182,8 +194,11 @@ DOC_HTML;
          <legend>Add New Airport & Modify</legend>
          <label>Add New Airport : </label><label id="error-msg">$error_msg</label><br>
          <input type="text" name="new_name" placeholder="Name"></input>
+         <input type="text" name="new_full_name" placeholder="Full Name"></input>
          <input type="number" step=0.000001  name="longitude" placeholder="Longitude"></input>
          <input type="number" step=0.000001  name="latitude" placeholder="Latitude"></input>
+         <input type="text" name="country" placeholder="Country"></input>
+         <input type="number" name="time" placeholder="Time Zone"></input>
          <br></br>
          <button type="submit" name="btn_add" value="on" class="btn btn-primary"><i class="icon-map-marker icon-white"></i> Add Airport</button>
          <button type="button"  class="btn btn-success" onclick="javascript:location.href='index.php'"><i class="icon-th-list icon-white"></i> Back to Flight List</button>
@@ -194,8 +209,11 @@ DOC_HTML;
       <tr class="info" id="title-row">
          <td id="title-cell">ID</td>
          <td id="title-cell">Name</td>
+         <td id="title-cell">Full Name</td>
          <td id="title-cell">Longitude</td>
          <td id="title-cell">Latitude</td>
+         <td id="title-cell">Country</td>
+         <td id="title-cell">Time Zone</td>
          <td id="title-cell"></td>
          <td id="title-cell"></td>
       </tr>

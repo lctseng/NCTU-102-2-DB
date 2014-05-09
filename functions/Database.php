@@ -175,6 +175,23 @@ function get_user_list()
    return $info_list;
 }
 
+
+function extract_hour($db,$datetime){ 
+   $key = "HOUR('$datetime')";
+   $_stat = $db->query("SELECT $key");
+   $obj = $_stat->fetchObject();
+   return $obj->$key-12;
+}
+
+function pack_time_zone($db,$hour){
+   $e_hour = $hour + 12 ;
+   $key = "MAKETIME($e_hour,0,0)";
+   $_stat = $db->query("SELECT $key ;");
+   $obj = $_stat->fetchObject();
+   return $obj->$key;
+}
+
+
 function get_airport_list(){
    $info_list = array();
    $db = create_db_link();
@@ -186,8 +203,11 @@ function get_airport_list(){
          $info = array();
          $info['id'] = $result->id;
          $info['name'] = $result->name;
+         $info['full_name'] = $result->full_name;
          $info['longitude'] = $result->longitude;
          $info['latitude'] = $result->latitude;
+         $info['country'] = $result->country;
+         $info['time_zone'] = extract_hour($db,$result->time_zone); 
          array_push($info_list,$info); 
       }
    }
@@ -195,7 +215,7 @@ function get_airport_list(){
    
 }
 
-function add_airport($name,$longitude,$latitude){
+function add_airport($name,$full_name,$longitude,$latitude,$country,$time_zone){
    $add_result = false;
    $error_msg = "";
    if(strlen($name)==0){
@@ -203,6 +223,9 @@ function add_airport($name,$longitude,$latitude){
    }
    else if(strlen(\lct\func\escape_html_tag($name))!=strlen($name)){
       $error_msg = "Name cannot contains illegal characters.";
+   }
+   else if(strlen(\lct\func\escape_html_tag($full_name))!=strlen($full_name)){
+      $error_msg = "Full Name cannot contains illegal characters.";
    }
    else if(!\lct\func\account_check($name)){
       $error_msg = "Name cannot contain only spaces.";
@@ -213,14 +236,17 @@ function add_airport($name,$longitude,$latitude){
    else if($latitude>90.0 || $latitude<-90.0){
       $error_msg = "Latitude must set between -90.0 to 90.0";
    }
+   else if(!check_hour_valid($time_zone)){ 
+      $error_msg = "Time zone must set between -12 to +12";
+   }
    else{
       $db = create_db_link();
 
       if($db)
       {
-         $sql = "INSERT INTO `Airport` (name,longitude,latitude) VALUES (?,?,?)";
+         $sql = "INSERT INTO `Airport` (name,full_name,longitude,latitude,country,time_zone) VALUES (?,?,?,?,?,?)";
          $sth = $db->prepare($sql);
-         $result = $sth->execute(array($name,$longitude,$latitude));
+         $result = $sth->execute(array($name,$full_name,$longitude,$latitude,$country,pack_time_zone($db,$time_zone)));
          if($result){
             $add_result = true;
             $error_msg = "";
@@ -245,7 +271,7 @@ function delete_airport($id){
    }
 }
 
-function edit_airport($id,$name,$longitude,$latitude){
+function edit_airport($id,$name,$full_name,$longitude,$latitude,$country,$time_zone){
    $add_result = false;
    $error_msg = "";
    if(strlen($name)==0){
@@ -253,6 +279,9 @@ function edit_airport($id,$name,$longitude,$latitude){
    }
    else if(strlen(\lct\func\escape_html_tag($name))!=strlen($name)){
       $error_msg = "Name cannot contains illegal characters.";
+   }
+   else if(strlen(\lct\func\escape_html_tag($full_name))!=strlen($full_name)){
+      $error_msg = "Full Name cannot contains illegal characters.";
    }
    else if(!\lct\func\account_check($name)){
       $error_msg = "Name cannot contain only spaces.";
@@ -263,6 +292,9 @@ function edit_airport($id,$name,$longitude,$latitude){
    else if($latitude>90.0 || $latitude<-90.0){
       $error_msg = "Latitude must set between -90.0 to 90.0";
    }
+   else if(!check_hour_valid($time_zone)){ 
+      $error_msg = "Time zone must set between -12 to +12";
+   }
    else{
       $db = create_db_link();
 
@@ -270,12 +302,15 @@ function edit_airport($id,$name,$longitude,$latitude){
       {
          $sql = "UPDATE `Airport` SET
             `name` = ?,
+            `full_name` = ?,
             `longitude` = ?,
-            `latitude` = ?
+            `latitude` = ?,
+            `country` = ?,
+            `time_zone` = ?
              WHERE `id` = ?
             ";
          $sth = $db->prepare($sql);
-         $result = $sth->execute(array($name,$longitude,$latitude,$id));
+         $result = $sth->execute(array($name,$full_name,$longitude,$latitude,$country,pack_time_zone($db,$time_zone),$id));
          if($result){
             $add_result = true;
             $error_msg = "";
