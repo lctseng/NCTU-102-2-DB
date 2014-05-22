@@ -543,11 +543,11 @@ function mark_favorite($uid,$fid)
 }
 
 
-function favorite_flight($uname,$fid)
+function favorite_flight($uname,$fid,$force_add = false)
 {
    $uid = get_uid($uname);
    #echo "User:$uid Favorite :$fid";
-   if(is_favorite($uid,$fid)){
+   if(is_favorite($uid,$fid) && !$force_add){
       remove_favorite($uid,$fid);
       #echo "Remove Favorite";
    }
@@ -818,12 +818,47 @@ function check_airport_full_name_valid($name){
    return $result;
 }
 
-function search_transfer_2($from,$to){ 
-   global $transfer_2_sql;
-   return search_transfer($transfer_2_sql,$from,$to);
+function search_transfer_2($from,$to,$order,$night){
+   global $default_order;
+   if($night){ 
+      global $transfer_sql_night;
+      $target_sql = $transfer_sql_night;
+   } 
+   else{
+      global $transfer_sql_all;
+      $target_sql = $transfer_sql_all;
+   }
+   $sql = $target_sql[2].$order.$default_order;
+   return search_transfer($sql,$from,$to,2);
+}
+function search_transfer_1($from,$to,$order,$night){ 
+   global $default_order;
+   if($night){ 
+      global $transfer_sql_night;
+      $target_sql = $transfer_sql_night;
+   } 
+   else{
+      global $transfer_sql_all;
+      $target_sql = $transfer_sql_all;
+   }
+   $sql = $target_sql[1].$order.$default_order;
+   return search_transfer($sql,$from,$to,1);
+}
+function search_transfer_0($from,$to,$order,$night){ 
+   global $default_order;
+   if($night){ 
+      global $transfer_sql_night;
+      $target_sql = $transfer_sql_night;
+   } 
+   else{
+      global $transfer_sql_all;
+      $target_sql = $transfer_sql_all;
+   }
+   $sql = $target_sql[0].$order.$default_order;
+   return search_transfer($sql,$from,$to,0);
 }
 
-function search_transfer($transfer_sql,$from,$to){
+function search_transfer($transfer_sql,$from,$to,$arg_copy){
    $error_msg = null;
    $info = array(); 
    # Check name if valid or not
@@ -847,7 +882,12 @@ function search_transfer($transfer_sql,$from,$to){
    if($db){
       $sql = $transfer_sql;
       $sth = $db->prepare($sql);
-      $sth->execute(array($r_from,$r_to,$r_from,$r_to,$r_from,$r_to));
+      $args = array($r_from,$r_to);
+      for($i=0;$i<$arg_copy;$i++){
+         array_push($args,$r_from);
+         array_push($args,$r_to);
+      }
+      $sth->execute($args);
       while($result = $sth->fetchObject()){
          $raw_info = array();
          $raw_info['id1'] = $result->id1;
@@ -856,6 +896,7 @@ function search_transfer($transfer_sql,$from,$to){
          $raw_info['f_time1'] = $result->f_time1;
          $raw_info['f_time2'] = $result->f_time2;
          $raw_info['f_time3'] = $result->f_time3;
+         $raw_info['total_time'] = $result->total_time;
          $raw_info['flight_time'] = $result->flight_time;
          $raw_info['transfer_time'] = $result->transfer_time;
          $raw_info['total_price'] = $result->total_price;
@@ -939,6 +980,7 @@ function pack_flight_set($raw){
    $flight_set = parse_flight_set($raw);
    $info = array(
       "set"=>$flight_set,
+      "total_time"=>$raw['total_time'],
       "flight_time"=>$raw['flight_time'],
       "transfer_time"=>$raw['transfer_time'],
       "total_price"=>$raw['total_price']
@@ -946,7 +988,32 @@ function pack_flight_set($raw){
    return $info;
 }
 
-
+function get_country_airport_set(){
+   $country_set = array();
+   $db = create_db_link(); 
+   if($db){
+      # 找出國家
+      $sql = "SELECT * FROM `Country` ORDER BY `full_name`";
+      $sth = $db->prepare($sql);
+      $sth->execute(); 
+      while($c_result = $sth->fetchObject())
+      {
+         $set = array();
+         $set['country'] = $c_result->full_name;
+         $airports = array();
+         # 找出各機場
+         $air_sql = "SELECT `full_name` FROM `Airport` WHERE `country` = '$c_result->name'  ORDER BY `full_name`";
+         $air_sth = $db->prepare($air_sql);
+         $air_sth->execute(array('TWN'));
+         while($a_result = $air_sth->fetchObject()){
+            array_push($airports,$a_result->full_name);
+         }
+         $set['airports'] = $airports;
+         array_push($country_set,$set);
+      }
+   }
+   return $country_set;
+}
 
 
 ?>

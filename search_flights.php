@@ -3,19 +3,42 @@ session_save_path("./sessions");
 session_start();
 require_once("./functions/Database.php");
 
-# var_dump($_POST);
+#  var_dump($_POST);
 
-$errmsg='';
+$errmsg='Search Specific Flights';
 $table_str='';
-$msg_id='';
+$msg_id='normal-msg';
 
 if(isset($_POST['btn_ok'])){
+   # 檢查登入
+   $logged_in = false;
+   if (\lct\func\check_user_valid($_SESSION["email"])){
+      $logged_in = true;
+   }
+
    $from = $_POST['depart_name'];
    $to = $_POST['dest_name'];
    $table_str = '';
    $errmsg = '';
    $msg_id='error-msg';
-   $result = \lct\func\search_transfer_2($from,$to); 
+   $tr_type = $_POST['transfer_radio'];
+   $order = $_POST['sort_order'];
+   $night = true;
+   $night_str = "No";
+   if($_POST['night']==="YES"){
+      $night = false;
+      $night_str = "Yes";
+   }
+   if($tr_type==='2'){
+      $result = \lct\func\search_transfer_2($from,$to,$order.',',$night); 
+   }
+   else if($tr_type==='1'){
+      $result = \lct\func\search_transfer_1($from,$to,$order.',',$night); 
+   }
+   else{ 
+      $result = \lct\func\search_transfer_0($from,$to,$order.',',$night); 
+   }
+   
    if(isset($result['errmsg'])){
       $table_str = '';
       $errmsg = $result['errmsg'];
@@ -25,14 +48,13 @@ if(isset($_POST['btn_ok'])){
       $count = 1;
       if(count($search_data) > 0){
          $msg_id='normal-msg';
-         $errmsg = "Displaying Result.";
+         $errmsg = "Displaying result : From '${_POST['depart_name']}' to '${_POST['dest_name']}' , limit max transfer times = ${_POST['transfer_radio']} ,overnight = $night_str ,order by $order. ";
          # 有資料才顯示
          $table_str.= <<<HTML_DOC
 <table class="table table-hover" id="outter-table">
 <tr class="info">
-   <td>
-      Result
-   </td>
+   <td>Result </td>
+   <td>Favorite</td>
    <td>
       <table id="inner-table">    
          <tr>
@@ -47,6 +69,7 @@ if(isset($_POST['btn_ok'])){
    </td>
    <td id="inner-td-long">Total Flight Time</td>
    <td id="inner-td-long">Transfer Time</td>
+   <td id="inner-td-long">Total Journey Time</td>
    <td id="inner-td">Price</td>
 </tr>
 HTML_DOC;
@@ -56,6 +79,22 @@ HTML_DOC;
             $table_str .= "<td>";
             $table_str .= "$count";
             $table_str .= "</td>";
+            if($logged_in){
+               $id_string = '';
+               foreach($flight_set['set'] as $flight){
+                  $id_string .= "${flight['id']} ";
+               }
+               $table_str .= <<<HTML_DOC
+<td>
+   <form action="index.php" method="post">   
+      <button type="submit" name="str_add_favorite" class="btn btn-warning btn-large" value="$id_string">Add</button>
+   </form>
+</td>
+HTML_DOC;
+            }
+            else{
+               $table_str.= '<td><a id="btn-main" class="btn btn-large disabled" style="width:65px;">Invalid</a></td>';
+            }
             $table_str .= "<td>";
             $table_str .= "<table id='inner-table'>";
             #echo "<br> Result $count <br>";
@@ -80,6 +119,7 @@ HTML_DOC;
             $table_str .= <<<HTML_DOC
 <td id="inner-td-long">${flight_set['flight_time']}</td>
 <td id="inner-td-long">${flight_set['transfer_time']}</td>
+<td id="inner-td-long">${flight_set['total_time']}</td>
 <td id="inner-td">${flight_set['total_price']}</td>
 
 HTML_DOC;
@@ -115,6 +155,7 @@ function show_search_page()
    global $errmsg;
    global $table_str;
    global $msg_id;
+   $airport_select_str = create_airport_select_option_str();
    echo <<<DOC_HTML
 <!doctype html>
 <html lang="en">
@@ -154,12 +195,16 @@ function show_search_page()
             width:180px;
          }
          #inner-table{
-            width:1000px;
+            width:1200px;
          }
          #outter-table{
-            width:1500px;
+            width:1800px;
          }
          #td-contain{
+         }
+
+         #select-airport{
+            width:200px;
          }
       </style>
    </head>
@@ -168,24 +213,41 @@ function show_search_page()
       <label id="$msg_id">$errmsg</label><br>
       <form action="search_flights.php" class="form-signin"  method="POST">
          Departure Airport Full Name<br>
-         <input type="text" name="depart_name" placeholder="Departure"></input><br>
+         <select id="select-airport" name='depart_name'>
+            $airport_select_str
+         </select><br>
          Destination Airport Full Name<br>
-         <input type="text" name="dest_name" placeholder="Destination"></input><br> 
+         <select id="select-airport" name='dest_name'>
+            $airport_select_str
+         </select><br>
          Transfer Option<br>
          <label class="radio">
-            <input type="radio" name="tansfer_radio" id="transfer-radio" value="0" checked>
-            Direct flight, No Transfer.
+            <input type="radio" name="transfer_radio" id="transfer-radio" value="0" checked>
+            Direct flight, no transfer.
          </label>
          <label class="radio">
-            <input type="radio" name="tansfer_radio" id="transfer-radio" value="1">
-            Transfer one time.
+            <input type="radio" name="transfer_radio" id="transfer-radio" value="1">
+            Transfer no more than one time.
          </label>
          <label class="radio">
-            <input type="radio" name="tansfer_radio" id="transfer-radio" value="2">
-            Transfer two time.
+            <input type="radio" name="transfer_radio" id="transfer-radio" value="2">
+            Transfer no more than two time.
          </label>
+         
+         <label class="checkbox">
+            <input type="checkbox" name="night" value="YES">
+            Overnight
+         </label>
+
+         Sort By:<br>
+         <select id="select-airport" name='sort_order'>
+            <option selected  value='total_price'>Total Price</option>
+            <option  value='total_time'>Total Journey Time</option>
+            <option  value='flight_time'>Total Flight Time</option>
+            <option  value='transfer_time'>Total Transfer Time</option>
+         </select><br>
          <button type="submit" class="btn btn-primary"  name="btn_ok" value="btn_search"><i class="icon-search icon-white"></i>Search</button>
-         <button type="button" class="btn btn-danger"  onclick="javascript:location.href='index.php'"><i class="icon-ban-circle icon-white"></i> Cancel</button>
+         <button type="button" class="btn btn-danger"  onclick="javascript:location.href='index.php'"><i class="icon-ban-circle icon-white"></i> Back to Main Page</button>
       </form>
       $table_str
    </body>
@@ -195,6 +257,25 @@ function show_search_page()
 DOC_HTML;
 }
 
+
+function create_airport_select_option_str(){
+   $op_str = '';
+   $country_set = \lct\func\get_country_airport_set();
+      $op_str.=<<<DOC_HTML
+   <option disabled selected value="">Select Airport</option>
+DOC_HTML;
+   foreach($country_set as $set){
+      $op_str.=<<<DOC_HTML
+   <option disabled value="" >--${set['country']}</option>
+DOC_HTML;
+      foreach($set['airports'] as $airport){   
+      $op_str.=<<<DOC_HTML
+   <option value="$airport" >$airport</option>
+DOC_HTML;
+      }
+   }
+   return $op_str;
+}
 
 
 

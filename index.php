@@ -96,7 +96,8 @@ function show_sign_in_page()
                <i class="icon-certificate"></i>Password<br>
                <input type="password" name="password"><br>
                <input type="checkbox" name="remember" class="checkbox"> Remember me<br>
-               <button type="submit" class="btn btn-large btn-primary">Sign in</button>
+               <button type="submit" class="btn btn-large btn-primary"><i class="icon-user icon-white"></i> Sign in</button>
+               <button type="button" id="btn-search-flight" class="btn btn-success btn-large" onclick="javascript:location.href='search_flights.php'"><i class="icon-search icon-white"></i> Search Flights</button>
             </form>
             <label class="signin-links">
                <a href="sign_up.php">Sign up</a><br>
@@ -138,6 +139,7 @@ function show_signed_in_page(){
 <button type="button" id="btn-new" class="btn btn-success" onclick="javascript:location.href='user_manage.php'"><i class="icon-user icon-white"></i> User Management</button>
 <button type="button" id="btn-new" class="btn btn-success" onclick="javascript:location.href='airport_manage.php'"><i class="icon-map-marker icon-white"></i> Airport Management</button>
 <button type="button" id="btn-new" class="btn btn-success" onclick="javascript:location.href='country_manage.php'"><i class="icon-home icon-white"></i> Country Management</button>
+<button type="button" id="btn-new" class="btn btn-success" onclick="javascript:location.href='search_flights.php'"><i class="icon-search icon-white"></i> Search Flights</button>
 EXTRA_HTML;
       $p_extra_th=<<<EXTRA_HTML
 <td></td>
@@ -744,6 +746,14 @@ if (\lct\func\check_user_valid($_SESSION["email"]))
    }
    if(isset($_POST['sort_key'])){ 
       \lct\func\set_sort_key($_POST['sort_key']);
+   }
+   if($_POST['str_add_favorite']){
+      # 拆解群組最愛
+      $tok = strtok($_POST['str_add_favorite'], " \n\t");
+      while ($tok !== false) {
+         \lct\func\favorite_flight($_SESSION['email'],$tok,true);
+         $tok = strtok(" \n\t");
+      }
    }
    if($_POST['btn_favorite'])
    {
