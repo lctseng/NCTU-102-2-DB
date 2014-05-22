@@ -1,6 +1,7 @@
 <?php
 namespace lct\func;
 
+require_once("transfer_sql.php");
 
 
 function load_db_data()
@@ -783,6 +784,169 @@ function set_sort_type($type){
    
 
 }
+
+
+function check_airport_full_name_exist($airport){
+   # Check whether in DB or not
+   $db = create_db_link();
+   if($db){
+      $sql = "SELECT `id` FROM `Airport` WHERE `full_name` = ?";
+      $sth = $db->prepare($sql);
+      $sth->execute(array($airport));
+      if($sth->fetchObject()){
+         return true;
+      }
+      else{
+         return false;
+      }
+   }
+   else{
+      return false;
+   }
+}
+
+
+function check_airport_full_name_valid($name){
+   $result = array();
+   $result['is_err'] = false;
+   $result['errmsg'] = '';
+   $chk = check_airport_full_name_exist($name);
+   if(!$chk){  
+      $result['is_err'] = true;
+      $result['errmsg'] = "Airport full name doesn't exist.";
+   }
+   return $result;
+}
+
+function search_transfer_2($from,$to){ 
+   global $transfer_2_sql;
+   return search_transfer($transfer_2_sql,$from,$to);
+}
+
+function search_transfer($transfer_sql,$from,$to){
+   $error_msg = null;
+   $info = array(); 
+   # Check name if valid or not
+   # Departure
+   $err_chk = check_airport_full_name_valid($from);
+   if($err_chk['is_err']){
+      return array('errmsg'=>'Departure '.$err_chk['errmsg']);
+   }
+   # Destination
+   $err_chk = check_airport_full_name_valid($to);
+   if($err_chk['is_err']){
+      return array('errmsg'=>'Destination '.$err_chk['errmsg']);
+   }
+
+   # Translate Full Name to abbr. name
+   $r_from = translate_to_abbr($from);
+   $r_to = translate_to_abbr($to);
+
+
+   $db = create_db_link();
+   if($db){
+      $sql = $transfer_sql;
+      $sth = $db->prepare($sql);
+      $sth->execute(array($r_from,$r_to,$r_from,$r_to,$r_from,$r_to));
+      while($result = $sth->fetchObject()){
+         $raw_info = array();
+         $raw_info['id1'] = $result->id1;
+         $raw_info['id2'] = $result->id2;
+         $raw_info['id3'] = $result->id3; 
+         $raw_info['f_time1'] = $result->f_time1;
+         $raw_info['f_time2'] = $result->f_time2;
+         $raw_info['f_time3'] = $result->f_time3;
+         $raw_info['flight_time'] = $result->flight_time;
+         $raw_info['transfer_time'] = $result->transfer_time;
+         $raw_info['total_price'] = $result->total_price;
+         
+         # var_dump($raw_info);
+         array_push($info,pack_flight_set($raw_info));
+      }
+   }
+   return array('data'=>$info,'errmsg'=>$error_msg);
+}
+
+
+function translate_to_abbr($full){ 
+   $db = create_db_link(); 
+   if($db){
+      $sql = "SELECT `name` FROM `Airport` WHERE `full_name` = ?";
+      $sth = $db->prepare($sql);
+      $sth->execute(array($full));
+      if($result = $sth->fetchObject()){
+         return $result->name;
+      }
+      else
+      {
+         return '';  
+      }
+   }
+   return '';
+}
+
+function id_to_flight_info($id){
+   $db = create_db_link(); 
+   if($db){
+      $sql = "SELECT * FROM `Flight` WHERE `id` = ?";
+      $sth = $db->prepare($sql);
+      $sth->execute(array($id)); 
+      if($result = $sth->fetchObject())
+      {
+         $info = array();
+         $info['id'] = $result->id;
+         $info['num'] = ($result->flight_number);
+         $info['depart'] = ($result->departure);
+         $info['dest'] = ($result->destination);
+         $info['price'] = $result->price;
+         $info['depart_d'] = strtok($result->departure_date," ");
+         $info['depart_h'] = $result->depart_hour;
+         $info['depart_m'] = $result->depart_min;
+         $info['arrive_d'] =  strtok($result->arrival_date," ");
+         $info['arrive_h'] = $result->arrive_hour;
+         $info['arrive_m'] = $result->arrive_min;
+      }
+   }
+   return $info;
+  
+}
+
+function parse_flight_set($raw){
+   $air_set = array();
+   if(isset($raw['id1'])){
+      # 將第一台飛機資訊轉換
+      $set_info = id_to_flight_info($raw['id1']);
+      $set_info['f_time'] = $raw['f_time1'];
+      array_push($air_set,$set_info);
+   }
+   if(isset($raw['id2'])){
+      # 將第2台飛機資訊轉換
+      $set_info = id_to_flight_info($raw['id2']);
+      $set_info['f_time'] = $raw['f_time2'];
+      array_push($air_set,$set_info);
+   }
+   if(isset($raw['id3'])){
+      # 將第3台飛機資訊轉換
+      $set_info = id_to_flight_info($raw['id3']);
+      $set_info['f_time'] = $raw['f_time3'];
+      array_push($air_set,$set_info);
+   }
+   return $air_set;
+}
+
+function pack_flight_set($raw){
+   
+   $flight_set = parse_flight_set($raw);
+   $info = array(
+      "set"=>$flight_set,
+      "flight_time"=>$raw['flight_time'],
+      "transfer_time"=>$raw['transfer_time'],
+      "total_price"=>$raw['total_price']
+   );
+   return $info;
+}
+
+
 
 
 ?>
