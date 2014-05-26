@@ -124,7 +124,9 @@ function show_signed_in_page(){
    # Privilege control
    #var_dump($_POST);
    $p_class = "Normal User";
-   $extra_button = "";
+   $extra_button = <<<HTML_DOC
+<button type="button" id="btn-new" class="btn btn-success" onclick="javascript:location.href='search_flights.php'"><i class="icon-search icon-white"></i> Search Flights</button>
+HTML_DOC;
    $admin = false;
    $p_extra_th = "";
    $P_extra_td_show = "";
@@ -134,12 +136,11 @@ function show_signed_in_page(){
       $total_width = "1600px";
       $admin = true;
       $p_class = "Administrator";
-      $extra_button=<<<EXTRA_HTML
+      $extra_button .=<<<EXTRA_HTML
 <button type="button" id="btn-new" class="btn btn-success" onclick="javascript:location.href='new_plane.php'"><i class="icon-plane icon-white"></i> New Plane</button>
 <button type="button" id="btn-new" class="btn btn-success" onclick="javascript:location.href='user_manage.php'"><i class="icon-user icon-white"></i> User Management</button>
 <button type="button" id="btn-new" class="btn btn-success" onclick="javascript:location.href='airport_manage.php'"><i class="icon-map-marker icon-white"></i> Airport Management</button>
 <button type="button" id="btn-new" class="btn btn-success" onclick="javascript:location.href='country_manage.php'"><i class="icon-home icon-white"></i> Country Management</button>
-<button type="button" id="btn-new" class="btn btn-success" onclick="javascript:location.href='search_flights.php'"><i class="icon-search icon-white"></i> Search Flights</button>
 EXTRA_HTML;
       $p_extra_th=<<<EXTRA_HTML
 <td></td>
