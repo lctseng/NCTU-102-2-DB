@@ -888,6 +888,7 @@ function search_transfer($transfer_sql,$from,$to,$arg_copy){
          array_push($args,$r_to);
       }
       $sth->execute($args);
+      # var_dump($sth->errorInfo());
       while($result = $sth->fetchObject()){
          $raw_info = array();
          $raw_info['id1'] = $result->id1;

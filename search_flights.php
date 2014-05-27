@@ -24,11 +24,11 @@ if(isset($_POST['btn_ok'])){
    $msg_id='error-msg';
    $tr_type = $_POST['transfer_radio'];
    $order = $_POST['sort_order'];
-   $night = true;
-   $night_str = "No";
-   if($_POST['night']==="YES"){
-      $night = false;
-      $night_str = "Yes";
+   $night = false;
+   $night_str = "Yes";
+   if($_POST['night']==="NO"){
+      $night = true;
+      $night_str = "No";
    }
    if($tr_type==='2'){
       $result = \lct\func\search_transfer_2($from,$to,$order.'',$night); 
@@ -253,7 +253,7 @@ echo <<<DOC_HTML
          
          <label class="checkbox">
             <input type="checkbox" name="night" value="YES">
-            Overnight
+            No overnight
          </label>
 
          Sort By:<br>
@@ -291,7 +291,7 @@ function create_airport_select_option_str(){
 DOC_HTML;
    foreach($country_set as $set){
       $op_str.=<<<DOC_HTML
-   <option disabled value="" >--${set['country']}</option>
+   <option id="normal-msg" disabled value="" >--${set['country']}</option>
 DOC_HTML;
       foreach($set['airports'] as $airport){   
       $op_str.=<<<DOC_HTML
