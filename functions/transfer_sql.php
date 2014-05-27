@@ -1195,7 +1195,7 @@ SELECT id1,id2,id3,f_time1,f_time2,f_time3,ADDTIME(f_time1,ADDTIME(f_time2,f_tim
 AS TransferTable
 ORDER BY 
 DOC_SQL;
-    $default_order = "depart_time,arrive_time -- 排序：價格";
+    $default_order = "";
 
 
 ?>

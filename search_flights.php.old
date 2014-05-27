@@ -8,7 +8,6 @@ require_once("./functions/Database.php");
 $errmsg='Search Specific Flights';
 $table_str='';
 $msg_id='normal-msg';
-$sql_show = '(NONE)';
 
 if(isset($_POST['btn_ok'])){
    # 檢查登入
@@ -39,8 +38,7 @@ if(isset($_POST['btn_ok'])){
    else{ 
       $result = \lct\func\search_transfer_0($from,$to,$order.'',$night); 
    }
-   $sql_show = $result['sql'];
-
+   
    if(isset($result['errmsg'])){
       $table_str = '';
       $errmsg = $result['errmsg'];
@@ -157,75 +155,69 @@ function show_search_page()
    global $errmsg;
    global $table_str;
    global $msg_id;
-   global $sql_show;
    $airport_select_str = create_airport_select_option_str();
-echo <<<DOC_HTML
+   echo <<<DOC_HTML
 <!doctype html>
 <html lang="en">
-<head>
- 
-   <meta charset="utf-8">
-   <title>Search Flights</title>
-   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <link href="bootstrap/css/bootstrap.css" rel="stylesheet">
-   <script src="bootstrap/jQuery/jquery-1.11.1.min.js"></script>
-   <script src="bootstrap/js/bootstrap.min.js"></script>
-   <style>
-      body {
-         margin-left:50px;
-         padding-top: 40px;
-         padding-bottom: 40px;
-         background-color: #f5f5f5;
-      }
-      .form-signin input[type="text"]{
-           font-size: 16px;
-           height: auto;
-           margin-bottom: 15px;
-           padding: 7px 9px;
-      }
-      .form-signin select{
-         width:80px;
-      }
-      #error-msg{
-        font-weight : bold;
-       color:rgb(255,0,0);
-      }
-      #normal-msg{
-        font-weight : bold;
-       color:rgb(0,0,255);
-      }
-      #inner-td{
-         width:150px;
-      }
-      #inner-td-long{
-         width:180px;
-      }
-      #inner-table{
-         width:1200px;
-      }
-      #outter-table{
-         width:1800px;
-      }
-      #td-contain{
-      }
+   <head>
+      <meta charset="utf-8">
+      <title>Search Flights</title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <link href="bootstrap/css/bootstrap.css" rel="stylesheet">
+      <script src="bootstrap/jQuery/jquery-1.11.1.min.js"></script>
+      <script src="bootstrap/js/bootstrap.min.js"></script>
+      <style>
+         body {
+            margin-left:50px;
+            padding-top: 40px;
+            padding-bottom: 40px;
+            background-color: #f5f5f5;
+         }
+         .form-signin input[type="text"]{
+              font-size: 16px;
+              height: auto;
+              margin-bottom: 15px;
+              padding: 7px 9px;
+         }
+         .form-signin select{
+            width:80px;
+         }
+         #error-msg{
+           font-weight : bold;
+          color:rgb(255,0,0);
+         }
+         #normal-msg{
+           font-weight : bold;
+          color:rgb(0,0,255);
+         }
+         #inner-td{
+            width:150px;
+         }
+         #inner-td-long{
+            width:180px;
+         }
+         #inner-table{
+            width:1200px;
+         }
+         #outter-table{
+            width:1800px;
+         }
+         #td-contain{
+         }
 
-      #select-airport{
-         width:200px;
-      }
-   </style>
-   <script> 
-      $(document).ready(function(){
-         $("#sql_btn").click(function(){
-          $("#sql").animate({
-            height:'toggle'
-          });
-        });
-      });
-   </script> 
-</head>
- 
-
-<body>
+         #select-airport{
+            width:200px;
+         }
+      </style>
+      <script> 
+         $(document).ready(function(){
+           $("button").click(function(){
+             $("div").animate({height:toggle});
+           });
+         });
+      </script> 
+   </head>
+   <body>
       <h1>Search Flights</h1>
       <label id="$msg_id">$errmsg</label><br>
       <form action="search_flights.php" class="form-signin"  method="POST">
@@ -268,12 +260,15 @@ echo <<<DOC_HTML
          <button type="submit" class="btn btn-primary"  name="btn_ok" value="btn_search"><i class="icon-search icon-white"></i>Search</button>
          <button type="button" class="btn btn-danger"  onclick="javascript:location.href='index.php'"><i class="icon-ban-circle icon-white"></i> Back to Main Page</button>
       </form>
-      <button id="sql_btn" class="btn btn-primary">Display SQL</button>
-      <div id="sql" style="display:none">
-        $sql_show
+      <button id="sql_btn" class="btn btn-primary">Click me</button>
+      <div id="sql" style="background:#98bf21;height:100px;width:100px;position:absolute;">
+         456
+      <button id="sql_btn" class="btn btn-primary">Click me</button>
+      <button id="sql_btn" class="btn btn-primary">Click me</button>
+      <button id="sql_btn" class="btn btn-primary">Click me</button>
+         456
+         456
       </div>
-      <br>
-      <br>
       $table_str
    </body>
 

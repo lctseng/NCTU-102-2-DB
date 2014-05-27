@@ -905,7 +905,7 @@ function search_transfer($transfer_sql,$from,$to,$arg_copy){
          array_push($info,pack_flight_set($raw_info));
       }
    }
-   return array('data'=>$info,'errmsg'=>$error_msg);
+   return array('data'=>$info,'errmsg'=>$error_msg,'sql'=>$sth->queryString);
 }
 
 
