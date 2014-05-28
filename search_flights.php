@@ -252,7 +252,7 @@ echo <<<DOC_HTML
          </label>
          
          <label class="checkbox">
-            <input type="checkbox" name="night" value="YES">
+            <input type="checkbox" name="night" value="NO">
             No overnight
          </label>
 
