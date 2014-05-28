@@ -172,7 +172,7 @@ SELECT id1,id2,id3,f_time1,f_time2,f_time3,ADDTIME(f_time1,ADDTIME(f_time2,f_tim
             AND Flight1.destination = Flight2.departure -- 1&2間中繼站必須相等
             AND Flight2.destination = ?  -- 抵達地點
         ) AS MatchFlight
-        WHERE MatchFlight.time_1 > '0000-00-00 02:00:00' -- 檢查轉機時間是否足夠
+        WHERE MatchFlight.time_1 >= '0000-00-00 02:00:00' -- 檢查轉機時間是否足夠
     )
     UNION
     (SELECT id1,id2,id3,f_time1,f_time2,f_time3,depart_time,arrive_time, ADDTIME(time_1,time_2) AS transfer_time,total_price -- 轉機兩次
@@ -530,7 +530,7 @@ SELECT id1,id2,id3,f_time1,f_time2,f_time3,ADDTIME(f_time1,ADDTIME(f_time2,f_tim
             AND Flight1.destination = Flight2.departure -- 1&2間中繼站必須相等
             AND Flight2.destination = ?  -- 抵達地點
         ) AS MatchFlight
-        WHERE MatchFlight.time_1 > '0000-00-00 02:00:00' -- 檢查轉機時間是否足夠
+        WHERE MatchFlight.time_1 >= '0000-00-00 02:00:00' -- 檢查轉機時間是否足夠
     )
 ) 
 AS TransferTable
@@ -769,7 +769,7 @@ SELECT id1,id2,id3,f_time1,f_time2,f_time3,ADDTIME(f_time1,ADDTIME(f_time2,f_tim
             AND Flight1.destination = Flight2.departure -- 1&2間中繼站必須相等
             AND Flight2.destination = ?  -- 抵達地點
         ) AS MatchFlight
-        WHERE MatchFlight.time_1 > '0000-00-00 02:00:00' -- 檢查轉機時間是否足夠
+        WHERE MatchFlight.time_1 >= '0000-00-00 02:00:00' -- 檢查轉機時間是否足夠
         AND MatchFlight.time_1 <= '0000-00-00 12:00:00'
     )
     UNION
@@ -1130,7 +1130,7 @@ SELECT id1,id2,id3,f_time1,f_time2,f_time3,ADDTIME(f_time1,ADDTIME(f_time2,f_tim
             AND Flight1.destination = Flight2.departure -- 1&2間中繼站必須相等
             AND Flight2.destination = ?  -- 抵達地點
         ) AS MatchFlight
-        WHERE MatchFlight.time_1 > '0000-00-00 02:00:00' -- 檢查轉機時間是否足夠
+        WHERE MatchFlight.time_1 >= '0000-00-00 02:00:00' -- 檢查轉機時間是否足夠
         AND MatchFlight.time_1 <= '0000-00-00 12:00:00' 
     )
 ) 
